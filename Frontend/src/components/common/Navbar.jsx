@@ -1,22 +1,24 @@
 import React, { useState } from "react";
+import { useCart } from "../CartContext";
 
-export default function Navbar() {
+
+export default function Navbar({ setIsCartOpen }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const { cart } = useCart();
 
   const navLinks = [
     { name: "Home", href: "/" },
     { name: "Products", href: "/products" },
-    { name: "Cart", href: "/cart" },
     { name: "Profile", href: "/profile" },
   ];
 
   return (
     <nav className="w-full bg-white shadow-md sticky top-0 left-0 z-50">
-      {/* Full width container */}
       <div className="w-full px-6">
         <div className="flex justify-between items-center h-16">
-          
-          {/* Brand Logo */}
+
+          {/* Logo */}
           <div className="flex-shrink-0">
             <a
               href="/"
@@ -37,14 +39,41 @@ export default function Navbar() {
                 {link.name}
               </a>
             ))}
+
+            {/* 🛒 CART ICON */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-2xl hover:scale-110 transition"
+            >
+              🛒
+
+              {cart?.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </button>
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center gap-4">
+
+            {/* Mobile Cart Icon */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-xl"
+            >
+              🛒
+              {cart?.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </button>
+
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               className="text-gray-700 hover:text-indigo-600 focus:outline-none p-2"
-              aria-label="Toggle menu"
             >
               <svg
                 className="w-6 h-6"
@@ -69,6 +98,7 @@ export default function Navbar() {
                 )}
               </svg>
             </button>
+
           </div>
         </div>
       </div>

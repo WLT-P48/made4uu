@@ -7,8 +7,19 @@ import Register from "../pages/register";
 import Cart from "../pages/cart";
 import Checkout from "../pages/checkout";
 import Profile from "../pages/profile";
+import Products from "../components/product";
+import ProductDetails from "../pages/ProductDetails";
+
 
 const AppRoutes = createBrowserRouter([
+    {
+    path: "/products",
+    element: <Products />,
+  },
+  {
+    path: "/product/:id",
+    element: <ProductDetails />,
+  },
   {
     path: "/",
     element: <Layout />,
