@@ -1,72 +1,18 @@
-require("dotenv").config();
-
-const express = require("express");
-const mongoose = require("mongoose");
-const cors = require("cors");
+const express = require('express');
+const mongoose = require('mongoose');
+const cors = require('cors'); // Essential for Frontend communication
+require('dotenv').config();
 
 const app = express();
 
-/* ===========================
-   MIDDLEWARE
-=========================== */
+app.use(express.json()); // Essential for reading form data
+app.use(cors()); 
 
-// Enable CORS
-app.use(cors());
+mongoose.connect(process.env.DB_CONNECT)
+  .then(() => console.log('Connected to DB!'))
+  .catch((err) => console.error('DB Connection Error:', err));
 
-// Parse JSON body
-app.use(express.json());
+const authRoute = require('./routes/auth');
+app.use('/api/user', authRoute); // This makes the URL: /api/user/register
 
-// Security headers (basic)
-app.use((req, res, next) => {
-  res.setHeader("X-Content-Type-Options", "nosniff");
-  res.setHeader("X-Frame-Options", "DENY");
-  res.setHeader("X-XSS-Protection", "1; mode=block");
-  next();
-});
-
-/* ===========================
-   ROUTES
-=========================== */
-
-// Health check route
-app.get("/", (req, res) => {
-  res.json({ message: "API is running..." });
-});
-
-// // Example route usage
-// app.use("/api/auth", require("./routes/authRoutes"));
-// app.use("/api/users", require("./routes/userRoutes"));
-// app.use("/api/products", require("./routes/productRoutes"));
-// app.use("/api/orders", require("./routes/orderRoutes"));
-
-/* ===========================
-   ERROR HANDLER
-=========================== */
-
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({
-    success: false,
-    message: "Server Error",
-  });
-});
-
-/* ===========================
-   DATABASE CONNECTION
-=========================== */
-
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
-
-    const PORT = process.env.PORT || 5000;
-
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch((error) => {
-    console.error("Database connection failed:", error);
-    process.exit(1);
-  });
+app.listen(5000, () => console.log('Server Up and Running on port 5000'));
