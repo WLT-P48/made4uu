@@ -1,10 +1,19 @@
 import React, { useState } from "react";
+import { useCart } from "../CartContext";
 
-export default function Navbar() {
+
+export default function Navbar({ setIsCartOpen }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const currentPath = window.location.pathname;
 
+  const { cart } = useCart();
+
   const navLinks = [
+<<<<<<< HEAD
+    { name: "Home", href: "/" },
+    { name: "Products", href: "/products" },
+    { name: "Profile", href: "/profile" },
+=======
     {
       name: "Home",
       href: "/",
@@ -37,6 +46,7 @@ export default function Navbar() {
         </svg>
       ),
     },
+>>>>>>> main
   ];
 
   const iconOnlyLinks = [
@@ -65,6 +75,21 @@ export default function Navbar() {
   const isActive = (href) => currentPath === href;
 
   return (
+<<<<<<< HEAD
+    <nav className="w-full bg-white shadow-md sticky top-0 left-0 z-50">
+      <div className="w-full px-6">
+        <div className="flex justify-between items-center h-16">
+
+          {/* Logo */}
+          <div className="flex-shrink-0">
+            <a
+              href="/"
+              className="text-2xl font-bold text-indigo-600 hover:text-indigo-700 transition-colors"
+            >
+              Made4UU
+            </a>
+          </div>
+=======
     <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md shadow-md">
       <div className="px-6">
         <div className="flex h-16 items-center justify-between">
@@ -76,6 +101,7 @@ export default function Navbar() {
           >
             Made4UU
           </a>
+>>>>>>> main
 
           {/* Desktop Menu */}
           <div className="hidden md:flex items-center gap-6">
@@ -125,8 +151,69 @@ export default function Navbar() {
                 )}
               </a>
             ))}
+
+            {/* 🛒 CART ICON */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-2xl hover:scale-110 transition"
+            >
+              🛒
+
+              {cart?.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </button>
           </div>
 
+<<<<<<< HEAD
+          {/* Mobile Menu Button */}
+          <div className="md:hidden flex items-center gap-4">
+
+            {/* Mobile Cart Icon */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative text-xl"
+            >
+              🛒
+              {cart?.length > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
+                  {cart.length}
+                </span>
+              )}
+            </button>
+
+            <button
+              onClick={() => setIsMenuOpen(!isMenuOpen)}
+              className="text-gray-700 hover:text-indigo-600 focus:outline-none p-2"
+            >
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                {isMenuOpen ? (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                ) : (
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M4 6h16M4 12h16M4 18h16"
+                  />
+                )}
+              </svg>
+            </button>
+
+          </div>
+=======
           {/* Mobile menu button */}
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -140,6 +227,7 @@ export default function Navbar() {
               )}
             </svg>
           </button>
+>>>>>>> main
         </div>
       </div>
 
