@@ -1,13 +1,17 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { useCart } from "../components/CartContext";
+import { ShoppingBagIcon } from "@heroicons/react/24/outline";
 
 import coffeeMug from "../assets/images/coffee-mug.jpg";
 import steelBottle from "../assets/images/steel-bottle.jpg";
 import giftCombo from "../assets/images/gift-combo.jpg";
 import digitalMala from "../assets/images/digital-mala.png";
 import woodenSofa from "../assets/images/wooden-sofa.jpg";
-import cupDrink from "../assets/images/cup-drink.jpg";
+import luxuryClock from "../assets/images/Luxury-Wall-Clock.jpg";
+import ceramicVase from "../assets/images/Ceramic-Flower-Vase.jpg";
+import decorativePot from "../assets/images/Decorative-Plant-Pot.jpg";
+import modermlamp from "../assets/images/Modern-Table-Lamp.jpg";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -18,265 +22,374 @@ const ProductDetails = () => {
   const products = [
     {
       id: 1,
-      name: "Aesthetic Coffee Mug",
+      title: "Aesthetic Coffee Mug",
+      description: "Premium ceramic coffee mug perfect for home and office use.",
       price: 299,
-      oldPrice: 399,
+      discountPrice: 399,
+      images: [coffeeMug],
+      stock: 5,
+      attributes: { category: "Mugs" },
       rating: 4.5,
-      reviews: 120,
-      img: coffeeMug,
-      description:
-        "Premium ceramic coffee mug perfect for home and office use.",
+      reviewCount: 120,
+      isActive: true,
     },
     {
       id: 2,
-      name: "Steel Water Bottle",
+      title: "Steel Water Bottle",
+      description: "Insulated stainless steel bottle keeps drinks hot & cold for hours.",
       price: 499,
-      oldPrice: 699,
+      discountPrice: 699,
+      images: [steelBottle],
+      stock: 10,
       rating: 4.3,
-      reviews: 95,
-      img: steelBottle,
-      description:
-        "Insulated stainless steel bottle keeps drinks hot & cold for hours.",
+      reviewCount: 95,
+      isActive: true,
     },
     {
       id: 3,
-      name: "Couple Gift Combo",
+      title: "Couple Gift Combo",
+      description: "Perfect romantic gift combo for special occasions.",
       price: 899,
-      oldPrice: 1199,
+      discountPrice: 1199,
+      images: [giftCombo],
+      stock: 7,
       rating: 4.8,
-      reviews: 210,
-      img: giftCombo,
-      description:
-        "Perfect romantic gift combo for special occasions.",
+      reviewCount: 210,
+      isActive: true,
     },
     {
       id: 4,
-      name: "Digital Mala",
+      title: "Digital Mala",
+      description: "Digital counter mala for meditation and spiritual counting.",
       price: 749,
-      oldPrice: 999,
+      discountPrice: 999,
+      images: [digitalMala],
+      stock: 8,
       rating: 4.4,
-      reviews: 140,
-      img: digitalMala,
-      description:
-        "Digital counter mala for meditation and spiritual counting.",
+      reviewCount: 140,
+      isActive: true,
     },
     {
       id: 5,
-      name: "Wooden Sofa Decor",
+      title: "Wooden Sofa Decor",
+      description: "Elegant wooden sofa decor piece for modern home interiors.",
       price: 1499,
-      oldPrice: 1899,
+      discountPrice: 1899,
+      images: [woodenSofa],
+      stock: 6,
       rating: 4.6,
-      reviews: 75,
-      img: woodenSofa,
-      description:
-        "Elegant wooden sofa decor piece for modern home interiors.",
+      reviewCount: 75,
+      isActive: true,
     },
+   
     {
-      id: 6,
-      name: "Glass Cup Drink Jar",
-      price: 349,
-      oldPrice: 499,
-      rating: 4.2,
-      reviews: 88,
-      img: cupDrink,
-      description:
-        "Stylish glass drink jar perfect for juices and cold beverages.",
-    },
-  ];
+  id: 6,
+  title: "Ceramic Flower Vase",
+  description: "Elegant ceramic flower vase for home decoration.",
+  price: 699,
+  discountPrice: 899,
+  images: [ceramicVase],
+  stock: 10,
+  attributes: { category: "Gift Combos" },
+  rating: 4.5,
+  reviewCount: 110,
+  isActive: true,
+},
+{
+  id: 7,
+  title: "Decorative Plant Pot",
+  description: "Stylish decorative plant pot for modern interiors.",
+  price: 499,
+  discountPrice: 699,
+  images: [decorativePot],
+  stock: 8,
+  attributes: { category: "Trending" },
+  rating: 4.4,
+  reviewCount: 72,
+  isActive: true,
+},
+{
+  id: 8,
+  title: "Modern Table Lamp",
+  description: "Minimal design modern table lamp for bedroom and living area.",
+  price: 699,
+  discountPrice: 999,
+  images: [modermlamp],
+  stock: 6,
+  attributes: { category: "Gift Combos" },
+  rating: 4.4,
+  reviewCount: 72,
+  isActive: true,
+},
+{
+  id: 9,
+  title: "Aesthetic Coffee Mug",
+  description: "Premium ceramic coffee mug perfect for home use.",
+  price: 299,
+  discountPrice: 399,
+  images: [coffeeMug],
+  stock: 12,
+  attributes: { category: "All" },
+  rating: 4.5,
+  reviewCount: 120,
+  isActive: true,
+},
+{
+  id: 10,
+  title: "Steel Water Bottle",
+  description: "Insulated stainless steel water bottle.",
+  price: 499,
+  discountPrice: 699,
+  images: [steelBottle],
+  stock: 10,
+  attributes: { category: "Bottles" },
+  rating: 4.3,
+  reviewCount: 95,
+  isActive: true,
+},
+{
+  id: 11,
+  title: "Couple Gift Combo",
+  description: "Romantic gift combo for special occasions.",
+  price: 899,
+  discountPrice: 1199,
+  images: [giftCombo],
+  stock: 7,
+  attributes: { category: "Gift Combos" },
+  rating: 4.8,
+  reviewCount: 210,
+  isActive: true,
+},
+{
+  id: 12,
+  title: "Digital Mala",
+  description: "Digital counter mala for meditation and prayer.",
+  price: 749,
+  discountPrice: 999,
+  images: [digitalMala],
+  stock: 8,
+  attributes: { category: "All" },
+  rating: 4.4,
+  reviewCount: 140,
+  isActive: true,
+},
+{
+  id: 13,
+  title: "Luxury Wall Clock",
+  description: "Premium luxury wall clock for home decor.",
+  price: 1299,
+  discountPrice: 1599,
+  images: [luxuryClock],
+  stock: 5,
+  attributes: { category: "Trending" },
+  rating: 4.7,
+  reviewCount: 88,
+  isActive: true,
+},
+{
+  id: 14,
+  title: "Ceramic Flower Vase",
+  description: "Elegant ceramic vase for modern homes.",
+  price: 699,
+  discountPrice: 899,
+  images: [ceramicVase],
+  stock: 9,
+  attributes: { category: "All" },
+  rating: 4.5,
+  reviewCount: 110,
+  isActive: true,
+},
+{
+  id: 15,
+  title: "Decorative Plant Pot",
+  description: "Indoor decorative plant pot.",
+  price: 499,
+  discountPrice: 699,
+  images: [decorativePot],
+  stock: 8,
+  attributes: { category: "Bottles" },
+  rating: 4.4,
+  reviewCount: 72,
+  isActive: true,
+},
+{
+  id: 16,
+  title: "Modern Table Lamp",
+  description: "Modern bedside lamp for stylish lighting.",
+  price: 699,
+  discountPrice: 999,
+  images: [modermlamp],
+  stock: 6,
+  attributes: { category: "Trending" },
+  rating: 4.4,
+  reviewCount: 72,
+  isActive: true,
+}
+    ];
+        
+ 
 
   const product = products.find((p) => p.id === Number(id));
-
-  if (!product) {
-    return <h2 className="text-center mt-10">Product not found</h2>;
-  }
+  if (!product) return <h2 className="text-center mt-10">Not Found</h2>;
 
   const discount = Math.round(
-    ((product.oldPrice - product.price) / product.oldPrice) * 100
+    ((product.discountPrice - product.price) / product.discountPrice) * 100
   );
 
   return (
-    <div className="min-h-screen bg-gray-100 px-10 py-16">
+    <div className="min-h-screen bg-gray-100 px-6 md:px-12 py-16">
 
       {/* MAIN PRODUCT SECTION */}
-      <div className="max-w-6xl mx-auto bg-white rounded-3xl shadow-xl p-10 grid md:grid-cols-2 gap-12">
-
-        {/* IMAGE */}
-        <div className="overflow-hidden rounded-2xl">
+      <div className="max-w-6xl mx-auto bg-white rounded-2xl shadow-sm p-10 grid md:grid-cols-2 gap-14">
+        
+        <div className="overflow-hidden rounded-xl">
           <img
-            src={product.img}
-            alt={product.name}
-            className="w-full transition duration-500 hover:scale-105"
+            src={product.images[0]}
+            alt={product.title}
+            className="w-full hover:scale-105 transition duration-500"
           />
-          {/* ======================= */}
-{/* MOBILE STICKY BUTTON */}
-{/* ======================= */}
-
-<div className="md:hidden fixed bottom-0 left-0 w-full bg-white shadow-2xl p-4 flex gap-3">
-
-  <button
-    onClick={() => {
-      for (let i = 0; i < quantity; i++) {
-        addToCart(product);
-      }
-    }}
-    className="w-1/2 bg-gradient-to-r from-pink-500 to-rose-500 
-    text-white py-3 rounded-xl font-semibold"
-  >
-    ADD TO BAG
-  </button>
-
-  <button
-    onClick={() => navigate("/checkout")}
-    className="w-1/2 border-2 border-pink-500 text-pink-500 
-    py-3 rounded-xl font-semibold"
-  >
-    BUY NOW
-  </button>
-
-</div>
-
         </div>
 
-        {/* DETAILS */}
         <div>
-          <h1 className="text-3xl font-bold mb-3">
-            {product.name}
+          <h1 className="text-3xl font-semibold text-gray-900">
+            {product.title}
           </h1>
 
-          <div className="text-yellow-500 mb-2">
-            ⭐ {product.rating} ({product.reviews} reviews)
+          <div className="mt-4 inline-flex items-center gap-2 border px-3 py-1 rounded-md">
+            <span className="text-green-600 text-2xl font-bold">
+              {product.rating}
+            </span>
+            <span className="text-green-600 text-2xl font-bold">★</span>
+            <span className="text-gray-600 text-lg">
+              {product.reviewCount} Ratings
+            </span>
           </div>
 
-          <div className="mb-4">
-            <p className="text-3xl font-bold">
+          <hr className="my-6" />
+
+          <div className="flex items-center gap-4">
+            <span className="text-4xl font-bold">
               ₹{product.price}
-            </p>
-            <div className="flex items-center gap-3">
-              <p className="line-through text-gray-400">
-                ₹{product.oldPrice}
-              </p>
-              <p className="text-green-600 font-semibold">
-                {discount}% OFF
-              </p>
-            </div>
+            </span>
+            <span className="line-through text-xl text-gray-400">
+              ₹{product.discountPrice}
+            </span>
+            <span className="text-orange-500 text-xl font-semibold">
+              ({discount}% OFF)
+            </span>
           </div>
 
-          <p className="text-gray-600 mb-6">
+          <p className="text-green-600 mt-2">
+            inclusive of all taxes
+          </p>
+
+          <p className="mt-6 text-gray-700 text-lg">
             {product.description}
           </p>
 
-          {/* ======================= */}
-{/* PREMIUM ADD TO CART UI */}
-{/* ======================= */}
+          {/* Quantity */}
+          <div className="mt-8">
+            <p className="font-semibold text-lg mb-4">Quantity</p>
+            <div className="flex items-center gap-6 bg-gray-100 px-6 py-4 rounded-xl w-fit">
+              <button
+                onClick={() => setQuantity(quantity > 1 ? quantity - 1 : 1)}
+                className="w-10 h-10 bg-white rounded-full border"
+              >
+                −
+              </button>
 
-<div className="mt-6 space-y-5">
+              <span className="text-lg font-semibold">
+                {quantity}
+              </span>
 
-  {/* Quantity Selector */}
-  <div className="flex items-center justify-between bg-gray-100 p-4 rounded-2xl">
-    <span className="font-semibold text-gray-700">
-      Quantity
-    </span>
+              <button
+                onClick={() =>
+                  setQuantity(quantity < product.stock ? quantity + 1 : quantity)
+                }
+                className="w-10 h-10 bg-white rounded-full border"
+              >
+                +
+              </button>
+            </div>
+          </div>
 
-    <div className="flex items-center gap-4">
-      <button
-        onClick={() =>
-          setQuantity(quantity > 1 ? quantity - 1 : 1)
-        }
-        className="w-9 h-9 rounded-full bg-white shadow-md 
-        hover:scale-110 transition font-bold"
-      >
-        −
-      </button>
-
-      <span className="text-lg font-semibold">
-        {quantity}
-      </span>
-
-      <button
-        onClick={() => setQuantity(quantity + 1)}
-        className="w-9 h-9 rounded-full bg-white shadow-md 
-        hover:scale-110 transition font-bold"
-      >
-        +
-      </button>
-    </div>
-  </div>
-
-  {/* Desktop Buttons */}
-  <div className="hidden md:flex gap-4">
-
-    <button
-      onClick={() => {
-        for (let i = 0; i < quantity; i++) {
-          addToCart(product);
-        }
-      }}
-      className="w-1/2 bg-gradient-to-r from-pink-500 to-rose-500 
-      text-white py-3 rounded-xl font-semibold 
-      hover:scale-105 transition duration-300 shadow-lg"
-    >
-      ADD TO BAG
-    </button>
-
-    <button
-      onClick={() => navigate("/checkout")}
-      className="w-1/2 border-2 border-pink-500 text-pink-500 
-      py-3 rounded-xl font-semibold hover:bg-pink-50 transition"
-    >
-      BUY NOW
-    </button>
-
-  </div>
-
-</div>
-
-          {/* Extra Info */}
-          <div className="mt-8 border-t pt-6 text-sm text-gray-600 space-y-2">
-            <p>🚚 Free Delivery within 3-5 days</p>
-            <p>🔄 7 Days Easy Return</p>
-            <p>🔒 Secure Payment Options</p>
+          <div className="mt-8">
+            <button
+              onClick={() => addToCart(product)}
+              className="flex items-center gap-2 bg-pink-500 hover:bg-pink-600 text-white px-8 py-3 rounded-lg transition"
+            >
+              <ShoppingBagIcon className="w-5 h-5" />
+              ADD TO BAG
+            </button>
           </div>
         </div>
       </div>
 
-      {/* SUGGESTED PRODUCTS */}
-      <div className="max-w-6xl mx-auto mt-20">
-        <h2 className="text-2xl font-bold mb-8">
-          You may also like
-        </h2>
+    {/* ========================= */}
+{/* SUGGESTED PRODUCTS */}
+{/* ========================= */}
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products
-            .filter((item) => item.id !== product.id)
-            .slice(0, 4)
-            .map((item) => (
-              <div
-                key={item.id}
-                onClick={() => navigate(`/product/${item.id}`)}
-                className="bg-white rounded-2xl shadow-md p-4 hover:shadow-2xl transition duration-300 cursor-pointer group"
-              >
-                <div className="overflow-hidden rounded-xl">
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="w-full h-40 object-cover transition duration-500 group-hover:scale-110"
-                  />
-                </div>
+<div className="max-w-[2000px] mx-auto mt-24 px-2">
+  <h2 className="text-3xl font-semibold mb-10">
+    You may also like
+  </h2>
 
-                <h3 className="mt-3 text-sm font-semibold group-hover:text-indigo-600 transition">
-                  {item.name}
-                </h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-10">
 
-                <p className="text-lg font-bold mt-2">
-                  ₹{item.price}
+    {products
+      .filter((item) => item.id !== product.id)
+.slice(0, 8)
+.map((item) => {
+        const discount = Math.round(
+          ((item.discountPrice - item.price) / item.discountPrice) * 100
+        );
+
+        return (
+          <div
+            key={item.id}
+            onClick={() => navigate(`/product/${item.id}`)}
+            className="bg-white rounded-3xl shadow-lg p-6 cursor-pointer transition duration-300"
+          >
+
+            {/* IMAGE */}
+            <div className="overflow-hidden rounded-2xl">
+              <img
+                src={item.images[0]}
+                alt={item.title}
+                className="w-full h-60 object-cover rounded-2xl hover:scale-110 transition duration-500"
+              />
+            </div>
+
+            {/* TITLE */}
+            <h3 className="mt-4 text-2xl font-bold text-gray-900">
+              {item.title}
+            </h3>
+
+            {/* PRICE */}
+            <div className="mt-3">
+              <p className="text-2xl font-bold">
+                ₹{item.price}
+              </p>
+
+              <div className="flex items-center gap-2">
+                <p className="text-black-400 line-through text-2xl">
+                  ₹{item.discountPrice}
+                </p>
+                <p className="text-orange-500 text-2xl font-semibold">
+                  {discount}% OFF
                 </p>
               </div>
-            ))}
-        </div>
-      </div>
+            </div>
+
+          </div>
+        );
+      })}
+
+  </div>
+</div>
 
     </div>
   );
 };
 
-export default ProductDetails;
+export default ProductDetails; 
