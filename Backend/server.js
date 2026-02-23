@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 // Routes
+const authRoute = require("./routes/auth.routes");
 const productRoutes = require("./routes/product.routes");
 const categoryRoutes = require("./routes/category.routes");
 const orderRoutes = require("./routes/order.routes");
@@ -41,6 +42,7 @@ app.get("/", (req, res) => {
 });
 
 // API routes
+app.use("/api/user", authRoute); // <-- Your login endpoint (/api/user/register etc.)
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
@@ -64,18 +66,19 @@ app.use((err, req, res, next) => {
    DATABASE CONNECTION
 =========================== */
 
-const MONGO_URI = process.env.MONGO_URI;
+
+const MONGO_URI = process.env.MONGO_URI; 
 const PORT = process.env.PORT || 5000;
 
 // Start server first
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 
-  // Connect to MongoDB (Mongoose v7+ does NOT need useNewUrlParser/useUnifiedTopology)
+  // Connect to MongoDB
   mongoose
     .connect(MONGO_URI)
     .then(() => {
-      console.log("MongoDB Connected");
+      console.log("MongoDB Connected!");
     })
     .catch((error) => {
       console.error("Database connection failed:", error);
