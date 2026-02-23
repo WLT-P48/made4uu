@@ -1,8 +1,16 @@
 require("dotenv").config();
-
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+
+// Routes
+const authRoute = require("./routes/auth.routes");
+const productRoutes = require("./routes/product.routes");
+const categoryRoutes = require("./routes/category.routes");
+const orderRoutes = require("./routes/order.routes");
+const addressRoutes = require("./routes/address.routes");
+const cartRoutes = require("./routes/cart.routes");
+const activityLogRoutes = require("./routes/activityLog.routes");
 
 const app = express();
 
@@ -28,16 +36,19 @@ app.use((req, res, next) => {
    ROUTES
 =========================== */
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
   res.json({ message: "API is running..." });
 });
 
-// // Example route usage
-// app.use("/api/auth", require("./routes/authRoutes"));
-// app.use("/api/users", require("./routes/userRoutes"));
-// app.use("/api/products", require("./routes/productRoutes"));
-// app.use("/api/orders", require("./routes/orderRoutes"));
+// API routes
+app.use("/api/user", authRoute); // <-- Your login endpoint (/api/user/register etc.)
+app.use("/api/products", productRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/orders", orderRoutes);
+app.use("/api/addresses", addressRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/activity-logs", activityLogRoutes);
 
 /* ===========================
    ERROR HANDLER
@@ -55,18 +66,22 @@ app.use((err, req, res, next) => {
    DATABASE CONNECTION
 =========================== */
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => {
-    console.log("MongoDB Connected");
 
-    const PORT = process.env.PORT || 5000;
+const MONGO_URI = process.env.MONGO_URI; 
+const PORT = process.env.PORT || 5000;
 
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+// Start server first
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+
+  // Connect to MongoDB
+  mongoose
+    .connect(MONGO_URI)
+    .then(() => {
+      console.log("MongoDB Connected!");
+    })
+    .catch((error) => {
+      console.error("Database connection failed:", error);
+      process.exit(1);
     });
-  })
-  .catch((error) => {
-    console.error("Database connection failed:", error);
-    process.exit(1);
-  });
+});
