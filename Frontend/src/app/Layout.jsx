@@ -1,21 +1,19 @@
-import React from "react";
+import { useState } from "react";
 import Navbar from "../components/common/Navbar";
-import Footer from "../components/common/Footer";
+import CartDrawer from "../components/CartDrawer";
 import { Outlet } from "react-router-dom";
 
-const Layout = () => {
+export default function Layout() {
+  const [isCartOpen, setIsCartOpen] = useState(false);
+
   return (
-    <div className="flex flex-col min-h-screen">
-      <Navbar />
-
-      {/* This is where route-based pages will render */}
-      <main className="flex-1">
-        <Outlet />
-      </main>
-
-      <Footer />
-    </div>
+    <>
+      <Navbar setIsCartOpen={setIsCartOpen} />
+      <Outlet />
+      <CartDrawer
+        isOpen={isCartOpen}
+        setIsOpen={setIsCartOpen}
+      />
+    </>
   );
-};
-
-export default Layout;
+}
