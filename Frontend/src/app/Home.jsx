@@ -1,10 +1,10 @@
-import React from 'react';
+import React from "react";
+import Button from "../components/common/Button";
 
 export default function HomePage() {
   return (
-    <main>
-      <h1>Welcome to Made4UU</h1>
-      <p>Your custom product marketplace</p>
-    </main>
+   <>
+    Hello there
+   </>
   );
 }
