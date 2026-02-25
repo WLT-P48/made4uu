@@ -1,13 +1,376 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png"
+    href="https://made4uu.com/cdn/shop/files/Gemini_Generated_Image_ffnvu6ffnvu6ffnv.png" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MADE4UU | Premium Personalized Tumblers</title>
+</head>
+
+<body>
+  <!-- Announcement Bar -->
+  <div class="announcement-bar glass">
+    <div class="container">
+      <p>Buy 1 Get 1 FREE – 2 Custom Tumblers at Just ₹1298!</p>
+    </div>
+  </div>
+
+  <!-- Navigation -->
+  <header class="header glass">
+    <div class="container nav-container">
+      <a href="/" class="logo">
+        <img src="https://made4uu.com/cdn/shop/files/ChatGPT_Image_Dec_2_2025_01_40_26_PM.png" alt="MADE4UU"
+          height="40">
+      </a>
+      <nav class="desktop-nav">
+        <a href="#" class="nav-link">Home</a>
+        <a href="#" class="nav-link">Catalog</a>
+        <a href="#" class="nav-link">About</a>
+        <a href="#" class="nav-link">Contact</a>
+      </nav>
+      <div class="nav-actions">
+        <button class="icon-btn" aria-label="Search">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+        </button>
+        <button class="icon-btn" aria-label="Cart">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"></path>
+            <path d="M3 6h18"></path>
+            <path d="M16 10a4 4 0 0 1-8 0"></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="hero-bg"></div>
+      <div class="container hero-content">
+        <h1 class="hero-title fade-in-up">Custom Made for <span class="text-accent underline">Only You.</span></h1>
+        <p class="hero-subtitle fade-in-up delay-1">Experience the ultimate personalized hydration with our premium
+          tumbler collection. Buy
+          1 Get 1 FREE – limited time offer.</p>
+        <div class="hero-actions fade-in-up delay-2">
+          <a href="#" class="btn btn-primary">Shop Collection</a>
+          <a href="#" class="btn btn-outline">Explore More</a>
+        </div>
+      </div>
+      <div class="hero-image fade-in-up delay-3">
+        <img
+          src="https://made4uu.com/cdn/shop/files/Cream_Minimalist_Promo_New_Tumbler_Collection_Instagram_Post_1600_x_700_px.png"
+          alt="Tumbler Collection">
+      </div>
+    </section>
+
+    <!-- Why Choose Us -->
+    <section id="features" class="section reveal">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Designed for Excellence</h2>
+          <p class="section-subtitle">Why MADE4UU is the preferred choice for personalized gifts.</p>
+        </div>
+        <div class="product-grid">
+          <div class="product-card" style="padding: 2rem; text-align: left;">
+            <h3 style="color: var(--color-accent); margin-bottom: 1rem;">Premium Quality</h3>
+            <p>Crafted from high-grade stainless steel with double-walled vacuum insulation.</p>
+          </div>
+          <div class="product-card" style="padding: 2rem; text-align: left;">
+            <h3 style="color: var(--color-accent); margin-bottom: 1rem;">Infinite Customization</h3>
+            <p>From names to custom graphics, make it truly one-of-a-kind with our laser engraving.</p>
+          </div>
+          <div class="product-card" style="padding: 2rem; text-align: left;">
+            <h3 style="color: var(--color-accent); margin-bottom: 1rem;">Eco-Conscious</h3>
+            <p>Reduce single-use plastic waste while enjoying your favorite drinks at the perfect temperature.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Collections -->
+    <section class="section glass-section">
+      <div class="container">
+        <div class="section-header reveal">
+          <h2 class="section-title">Our Best-Selling Gifts</h2>
+          <p class="section-subtitle">Curated with love, designed for you.</p>
+        </div>
+        <div class="product-grid" id="featured-products">
+          <!-- Dynamic Products -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-grid">
+      <div class="footer-info">
+        <img src="https://made4uu.com/cdn/shop/files/ChatGPT_Image_Dec_2_2025_01_40_26_PM.png" alt="MADE4UU"
+          height="30">
+        <p>Premium personalized gifts for every occasion.</p>
+      </div>
+      <div class="footer-links">
+        <h4>Explore</h4>
+        <a href="#">Catalog</a>
+        <a href="#">Tumblers</a>
+        <a href="#">Glass Collection</a>
+      </div>
+      <div class="footer-social">
+        <h4>Connect</h4>
+        <div class="social-icons">
+          <a href="https://www.facebook.com/Made4onlyyouu" target="_blank">Facebook</a>
+          <a href="https://www.instagram.com/made4uu.official?igsh=MWUydHE1cm94b3p5bw%3D%3D&utm_source=qr"
+            target="_blank">Instagram</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="container">
+        <p>&copy; 2025 MADE4UU. All rights reserved.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script type="module" src="/src/main.ts"></script>
+  <style>
+    /* Layout Specific Styles */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      height: 70px;
+      display: flex;
+      align-items: center;
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .desktop-nav {
+      display: flex;
+      gap: var(--spacing-lg);
+    }
+
+    .nav-link {
+      text-decoration: none;
+      color: var(--color-text);
+      font-weight: 500;
+      transition: var(--transition-fast);
+    }
+
+    .nav-link:hover {
+      color: var(--color-accent);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: var(--spacing-md);
+    }
+
+    .icon-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 8px;
+      border-radius: 50%;
+      transition: var(--transition-fast);
+    }
+
+    .icon-btn:hover {
+      background: var(--color-accent-soft);
+    }
+
+    /* Hero Styles */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding-top: 100px;
+      background: var(--color-bg-soft);
+      overflow: hidden;
+    }
+
+    .hero-bg {
+      position: absolute;
+      top: -10%;
+      right: -10%;
+      width: 60%;
+      height: 80%;
+      background: radial-gradient(circle, rgba(51, 79, 180, 0.08) 0%, rgba(255, 255, 255, 0) 70%);
+      z-index: 0;
+      border-radius: 50%;
+      filter: blur(60px);
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      max-width: 800px;
+    }
+
+    .hero-title {
+      font-size: 4.5rem;
+      line-height: 1.1;
+      margin-bottom: var(--spacing-md);
+    }
+
+    .text-accent {
+      color: var(--color-accent);
+    }
+
+    .underline {
+      position: relative;
+      display: inline-block;
+    }
+
+    .underline::after {
+      content: '';
+      position: absolute;
+      bottom: 8px;
+      left: 0;
+      width: 100%;
+      height: 12px;
+      background: var(--color-accent-soft);
+      z-index: -1;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--color-text-muted);
+      margin-bottom: var(--spacing-lg);
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: var(--spacing-md);
+      justify-content: center;
+    }
+
+    .hero-image {
+      margin-top: var(--spacing-xl);
+      width: 100%;
+      max-width: 1000px;
+      border-radius: var(--spacing-lg);
+      overflow: hidden;
+      box-shadow: var(--shadow-lg);
+      z-index: 1;
+    }
+
+    .hero-image img {
+      width: 100%;
+      display: block;
+    }
+
+    /* Section Styles */
+    .section-header {
+      text-align: center;
+      margin-bottom: var(--spacing-xl);
+    }
+
+    .section-title {
+      font-size: 3rem;
+      margin-bottom: var(--spacing-sm);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    /* Footer */
+    .footer {
+      background: #0f172a;
+      color: white;
+      padding-top: var(--spacing-xl);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: var(--spacing-xl);
+      padding-bottom: var(--spacing-xl);
+    }
+
+    .footer-info p {
+      margin-top: var(--spacing-md);
+      color: #94a3b8;
+    }
+
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    .footer-links a {
+      color: #94a3b8;
+      text-decoration: none;
+      transition: var(--transition-fast);
+    }
+
+    .footer-links a:hover {
+      color: white;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: var(--spacing-lg) 0;
+      text-align: center;
+      color: #64748b;
+      font-size: 0.875rem;
+    }
+
+    .announcement-bar {
+      background: var(--color-accent);
+      color: white;
+      text-align: center;
+      padding: 8px 0;
+      font-size: 0.9rem;
+      font-weight: 600;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1001;
+    }
+
+    .header {
+      top: 36px;
+      /* Offset for announcement bar */
+    }
+
+    @media (max-width: 768px) {
+      .hero-title {
+        font-size: 3rem;
+      }
+
+      .desktop-nav {
+        display: none;
+      }
+    }
+  </style>
+</body>
+
 </html>
