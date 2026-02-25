@@ -7,6 +7,7 @@ import Register from "../pages/register";
 import Cart from "../pages/cart";
 import Checkout from "../pages/checkout";
 import Profile from "../pages/profile";
+import Aboutus from "../pages/Aboutus";
 import Products from "../components/product";
 import ProductDetails from "../pages/ProductDetails";
 
@@ -47,6 +48,10 @@ const AppRoutes = createBrowserRouter([
       {
         path: "profile",
         element: <Profile />
+      },
+      {
+        path: "about-us",
+        element:<Aboutus />
       },
       {
         path: "*",
