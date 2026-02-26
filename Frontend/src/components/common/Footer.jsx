@@ -44,6 +44,7 @@ export default function Footer() {
               { name: "Privacy Policy", href: "/privacy" },
               { name: "Terms of Service", href: "/terms" },
               { name: "Contact Us", href: "/contact" },
+              { name : "About Us", href: "/about-us"}
             ].map((link) => (
               <li key={link.name} className="relative group">
                 <a
@@ -56,8 +57,8 @@ export default function Footer() {
                 {/* Animated underline */}
                 <span
                   className="
-                    absolute left-0 -bottom-1 h-[2px] w-0
-                    bg-gradient-to-r from-indigo-500 to-purple-500
+                    absolute left-0 -bottom-1 h-0.5 w-0
+                    bg-linear-to-r from-indigo-500 to-purple-500
                     transition-all duration-300
                     group-hover:w-full
                   "
@@ -69,7 +70,7 @@ export default function Footer() {
 
         {/* Divider */}
         <div className="relative my-8">
-          <div className="h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent" />
+          <div className="h-px bg-linear-to-r from-transparent via-gray-300 to-transparent" />
         </div>
 
         {/* Bottom Section */}
