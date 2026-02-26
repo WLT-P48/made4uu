@@ -1,12 +1,8 @@
 import React, { useState } from "react";
-import { useCart } from "../CartContext";
 
-
-export default function Navbar({ setIsCartOpen }) {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const currentPath = window.location.pathname;
-
-  const { cart } = useCart();
 
   const navLinks = [
     {
@@ -69,7 +65,6 @@ export default function Navbar({ setIsCartOpen }) {
   const isActive = (href) => currentPath === href;
 
   return (
-
     <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md shadow-md">
       <div className="px-6">
         <div className="flex h-16 items-center justify-between">
@@ -130,22 +125,7 @@ export default function Navbar({ setIsCartOpen }) {
                 )}
               </a>
             ))}
-
-            {/* 🛒 CART ICON */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative text-2xl hover:scale-110 transition"
-            >
-              🛒
-
-              {cart?.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {cart.length}
-                </span>
-              )}
-            </button>
           </div>
-
 
           {/* Mobile menu button */}
           <button
@@ -160,7 +140,6 @@ export default function Navbar({ setIsCartOpen }) {
               )}
             </svg>
           </button>
-
         </div>
       </div>
 
