@@ -32,8 +32,40 @@ export default function Navbar({ setIsCartOpen }) {
       href: "/contact",
       icon: (
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+<<<<<<< HEAD
           <path strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
             d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" />
+=======
+          <path
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"
+          />
+        </svg>
+      ),
+    },
+  ];
+
+  const iconOnlyLinks = [
+    {
+      name: "Cart",
+      href: "/cart",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
+          <circle cx="9" cy="21" r="1" />
+          <circle cx="17" cy="21" r="1" />
+        </svg>
+      ),
+    },
+    {
+      name: "Profile",
+      href: "/profile",
+      icon: (
+        <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+          <path d="M12 12a5 5 0 1 0-5-5 5 5 0 0 0 5 5zm0 2c-4.42 0-8 2.24-8 5v1h16v-1c0-2.76-3.58-5-8-5z" />
+>>>>>>> main
         </svg>
       ),
     },
@@ -42,7 +74,12 @@ export default function Navbar({ setIsCartOpen }) {
   const isActive = (href) => currentPath === href;
 
   return (
+<<<<<<< HEAD
     <nav className="sticky top-0 z-50 w-full bg-white shadow-md">
+=======
+
+    <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md shadow-md">
+>>>>>>> main
       <div className="px-6">
         <div className="flex h-16 items-center justify-between">
 
@@ -68,6 +105,13 @@ export default function Navbar({ setIsCartOpen }) {
               >
                 {link.icon}
                 <span className="text-sm font-medium">{link.name}</span>
+<<<<<<< HEAD
+=======
+
+                {isActive(link.href) && (
+                  <span className="absolute bottom-0 left-2 right-2 h-0.5 bg-indigo-600 rounded-full" />
+                )}
+>>>>>>> main
               </a>
             ))}
 
@@ -85,13 +129,22 @@ export default function Navbar({ setIsCartOpen }) {
             </button>
           </div>
 
+<<<<<<< HEAD
           {/* Mobile Toggle */}
+=======
+
+          {/* Mobile menu button */}
+>>>>>>> main
           <button
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className="md:hidden p-2 text-gray-700"
           >
             ☰
           </button>
+<<<<<<< HEAD
+=======
+
+>>>>>>> main
         </div>
       </div>
 
