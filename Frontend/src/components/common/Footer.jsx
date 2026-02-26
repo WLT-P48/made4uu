@@ -2,12 +2,12 @@ import React from "react";
 
 export default function Footer() {
   return (
-    <footer className="relative bg-gray-100 text-gray-700 overflow-hidden">
+    <footer className="relative bg-black text-white overflow-hidden">
       
       {/* Subtle animated background glow */}
       <div className="absolute inset-0 -z-10">
-        <div className="absolute -top-24 -left-24 w-72 h-72 bg-indigo-200/40 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-200/40 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -top-24 -left-24 w-72 h-72 bg-indigo-600/20 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute -bottom-24 -right-24 w-72 h-72 bg-purple-600/20 rounded-full blur-3xl animate-pulse" />
       </div>
 
       <div className="max-w-7xl mx-auto px-6 py-12">
@@ -24,15 +24,15 @@ export default function Footer() {
           <div className="group transition-transform duration-300 hover:-translate-y-1">
             <h2
               className="
-                text-2xl font-extrabold text-gray-900
+                text-2xl font-extrabold text-white
                 transition-all duration-300
-                group-hover:text-indigo-600
+                group-hover:text-indigo-400
                 group-hover:drop-shadow-md
               "
             >
               Made4UU
             </h2>
-            <p className="mt-2 text-sm text-gray-600 max-w-sm leading-relaxed">
+            <p className="mt-2 text-sm text-gray-300 max-w-sm leading-relaxed">
               Custom-designed products made just for you. Quality,
               creativity, and style delivered to your doorstep.
             </p>
@@ -49,7 +49,7 @@ export default function Footer() {
               <li key={link.name} className="relative group">
                 <a
                   href={link.href}
-                  className="transition-colors duration-300 group-hover:text-indigo-600"
+                  className="text-white transition-colors duration-300 group-hover:text-indigo-400"
                 >
                   {link.name}
                 </a>
@@ -70,18 +70,18 @@ export default function Footer() {
 
         {/* Divider */}
         <div className="relative my-8">
-          <div className="h-px bg-linear-to-r from-transparent via-gray-300 to-transparent" />
+          <div className="h-px bg-gradient-to-r from-transparent via-gray-600 to-transparent" />
         </div>
 
         {/* Bottom Section */}
         <div
           className="
-            text-center text-sm text-gray-500
+            text-center text-sm text-gray-400
             animate-[fadeUp_1s_ease-out_forwards]
           "
         >
           &copy; {new Date().getFullYear()}{" "}
-          <span className="font-medium text-gray-700 hover:text-indigo-600 transition">
+          <span className="font-medium text-white hover:text-indigo-400 transition">
             Made4UU
           </span>
           . All rights reserved.
