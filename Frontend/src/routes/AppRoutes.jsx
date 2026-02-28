@@ -9,7 +9,7 @@ import Checkout from "../pages/checkout";
 import Profile from "../pages/profile";
 import Aboutus from "../pages/Aboutus";
 import Contact from "../pages/Contact";
-import Products from "../components/product";
+import Products from "../pages/products";
 import ProductDetails from "../pages/ProductDetails";
 import MyOrders from "../pages/MyOrders";
 

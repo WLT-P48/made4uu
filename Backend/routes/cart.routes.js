@@ -3,7 +3,8 @@ const {
   getCart,
   addOrUpdateCartItem,
   removeCartItem,
-  clearCart
+  clearCart,
+  updateCartItemQuantity
 } = require("../controllers/cart.controller");
 
 const router = express.Router();
@@ -18,10 +19,13 @@ router.get("/:userId", getCart);
 // Add or update item in cart
 router.post("/", addOrUpdateCartItem);
 
-// Remove single item from cart
-router.delete("/:userId/item/:productId", removeCartItem);
+// Update item quantity (set absolute quantity)
+router.put("/:userId/:productId", updateCartItemQuantity);
 
-// Clear all items from cart
-router.delete("/:userId/clear", clearCart);
+// Remove single item from cart (FIXED)
+router.delete("/:userId/:productId", removeCartItem);
+
+// Clear all items from cart (FIXED)
+router.delete("/:userId", clearCart);
 
 module.exports = router;

@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useCart } from "../CartContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const currentPath = window.location.pathname;
+  const { cartCount } = useCart();
 
   const navLinks = [
     {
@@ -118,7 +120,22 @@ export default function Navbar() {
                   }
                 `}
               >
-                {link.icon}
+                {link.name === "Cart" ? (
+                  <div className="relative">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
+                      <circle cx="9" cy="21" r="1" />
+                      <circle cx="17" cy="21" r="1" />
+                    </svg>
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                        {cartCount > 9 ? "9+" : cartCount}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  link.icon
+                )}
 
                 {isActive(link.href) && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-indigo-600 rounded-full" />

@@ -1,28 +1,36 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import orderService from '../services/order.service';
-import { isAuthenticated } from '../services/auth.service';
+import { getProfile, isAuthenticated } from '../services/auth.service';
 
 const MyOrders = () => {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedOrder, setSelectedOrder] = useState(null);
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      window.location.href = '/login';
+      navigate('/login');
       return;
     }
-    fetchOrders();
-  }, []);
+    fetchUserAndOrders();
+  }, [navigate]);
 
-  const fetchOrders = async () => {
+  const fetchUserAndOrders = async () => {
     try {
       setLoading(true);
-      const result = await orderService.getOrders();
+      // Get user profile first
+      const userData = await getProfile();
+      setUserId(userData._id);
+      
+      // Then fetch orders for this user
+      const result = await orderService.getUserOrders(userData._id);
       if (result.success) {
-        setOrders(result.data.data || result.data || []);
+        setOrders(result.data || []);
       } else {
         setError(result.error || 'Failed to load orders');
       }
@@ -34,6 +42,7 @@ const MyOrders = () => {
   };
 
   const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
       month: 'long',
@@ -43,14 +52,18 @@ const MyOrders = () => {
 
   const getStatusColor = (status) => {
     const statusColors = {
+      'PLACED': 'bg-yellow-100 text-yellow-800',
+      'PAID': 'bg-blue-100 text-blue-800',
+      'SHIPPED': 'bg-purple-100 text-purple-800',
+      'DELIVERED': 'bg-green-100 text-green-800',
+      'CANCELLED': 'bg-red-100 text-red-800',
       'pending': 'bg-yellow-100 text-yellow-800',
       'processing': 'bg-blue-100 text-blue-800',
       'shipped': 'bg-purple-100 text-purple-800',
       'delivered': 'bg-green-100 text-green-800',
       'cancelled': 'bg-red-100 text-red-800',
-      'refunded': 'bg-gray-100 text-gray-800'
     };
-    return statusColors[status?.toLowerCase()] || 'bg-gray-100 text-gray-800';
+    return statusColors[status?.toUpperCase()] || 'bg-gray-100 text-gray-800';
   };
 
   const containerVariants = {
@@ -123,14 +136,14 @@ const MyOrders = () => {
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">No Orders Yet</h3>
                 <p className="text-gray-500 text-sm mb-6">You haven't placed any orders yet.</p>
-                <motion.a
-                  href="/"
+                <motion.button
+                  onClick={() => navigate('/products')}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="inline-block bg-black text-white font-bold tracking-widest uppercase text-xs sm:text-sm py-2.5 sm:py-4 px-6 sm:px-8 rounded-lg transition-colors"
+                  className="inline-block bg-black text-white font-bold tracking-widest uppercase text-xs sm:text-sm py-2.5 sm:py-4 px-6 sm:px-8 rounded-lg transition-colors cursor-pointer"
                 >
                   Start Shopping
-                </motion.a>
+                </motion.button>
               </div>
             ) : (
               <div className="space-y-4 sm:space-y-6">
@@ -144,10 +157,10 @@ const MyOrders = () => {
                     <div className="bg-white p-3 sm:p-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
                       <div>
                         <p className="text-xs font-bold tracking-wider text-gray-400 uppercase">
-                          Order ID
+                          Order Number
                         </p>
                         <p className="text-sm sm:text-base font-semibold text-gray-900">
-                          #{order._id?.slice(-8).toUpperCase() || order.orderId?.slice(-8).toUpperCase()}
+                          {order.orderNumber || `#${order._id?.slice(-8).toUpperCase()}`}
                         </p>
                       </div>
                       <div className="text-right">
@@ -155,7 +168,7 @@ const MyOrders = () => {
                           Date
                         </p>
                         <p className="text-sm sm:text-base font-semibold text-gray-900">
-                          {formatDate(order.createdAt || order.date)}
+                          {formatDate(order.createdAt)}
                         </p>
                       </div>
                       <div className="text-right">
@@ -163,7 +176,7 @@ const MyOrders = () => {
                           Status
                         </p>
                         <span className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${getStatusColor(order.status)}`}>
-                          {order.status || 'Pending'}
+                          {order.status || 'PLACED'}
                         </span>
                       </div>
                       <div className="text-right">
@@ -171,7 +184,7 @@ const MyOrders = () => {
                           Total
                         </p>
                         <p className="text-sm sm:text-base font-bold text-gray-900">
-                          ₹{order.total?.toFixed(2) || order.totalAmount?.toFixed(2) || '0.00'}
+                          ₹{order.totalAmount?.toFixed(2) || '0.00'}
                         </p>
                       </div>
                     </div>
@@ -181,20 +194,18 @@ const MyOrders = () => {
                       <div className="flex flex-wrap items-center gap-2 sm:gap-4">
                         {order.items?.slice(0, 3).map((item, index) => (
                           <div key={index} className="flex items-center gap-2 sm:gap-3">
-                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg overflow-hidden">
-                              {item.image ? (
-                                <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                            <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gray-200 rounded-lg overflow-hidden flex items-center justify-center">
+                              {item.productId?.images?.[0]?.url ? (
+                                <img src={item.productId.images[0].url} alt={item.title} className="w-full h-full object-cover" />
                               ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                  </svg>
-                                </div>
+                                <svg className="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                </svg>
                               )}
                             </div>
                             <div className="min-w-0">
                               <p className="text-xs sm:text-sm font-medium text-gray-900 truncate max-w-[120px] sm:max-w-[200px]">
-                                {item.name || item.productName}
+                                {item.title || item.productId?.title}
                               </p>
                               <p className="text-xs text-gray-500">
                                 Qty: {item.quantity}
@@ -216,7 +227,7 @@ const MyOrders = () => {
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => setSelectedOrder(selectedOrder?._id === order._id ? null : order)}
-                        className="w-full mt-3 sm:mt-4 bg-black text-white font-bold tracking-widest uppercase text-xs sm:text-sm py-2 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2"
+                        className="w-full mt-3 sm:mt-4 bg-black text-white font-bold tracking-widest uppercase text-xs sm:text-sm py-2 sm:py-3 rounded-lg transition-colors flex items-center justify-center gap-2 cursor-pointer"
                       >
                         {selectedOrder?._id === order._id ? 'Hide Details' : 'View Details'}
                         <svg className={`w-4 h-4 transition-transform ${selectedOrder?._id === order._id ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -237,13 +248,13 @@ const MyOrders = () => {
                               <h4 className="text-sm font-bold text-gray-900 uppercase tracking-wider">Order Details</h4>
                               
                               {/* Shipping Address */}
-                              {order.shippingAddress && (
+                              {order.shippingAddressId && (
                                 <div className="bg-white p-3 rounded-lg border border-gray-200">
                                   <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Shipping Address</p>
-                                  <p className="text-sm text-gray-900">{order.shippingAddress.name}</p>
-                                  <p className="text-sm text-gray-600">{order.shippingAddress.phone}</p>
-                                  <p className="text-sm text-gray-600">{order.shippingAddress.line1}</p>
-                                  <p className="text-sm text-gray-600">{order.shippingAddress.city}, {order.shippingAddress.state} {order.shippingAddress.postalCode}</p>
+                                  <p className="text-sm text-gray-900">{order.shippingAddressId.name || 'N/A'}</p>
+                                  <p className="text-sm text-gray-600">{order.shippingAddressId.phone || 'N/A'}</p>
+                                  <p className="text-sm text-gray-600">{order.shippingAddressId.line1 || 'N/A'}</p>
+                                  <p className="text-sm text-gray-600">{order.shippingAddressId.city}, {order.shippingAddressId.state} {order.shippingAddressId.postalCode}</p>
                                 </div>
                               )}
 
@@ -253,11 +264,17 @@ const MyOrders = () => {
                                 {order.items?.map((item, index) => (
                                   <div key={index} className="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
                                     <div className="flex items-center gap-3">
-                                      <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden">
-                                        {item.image && <img src={item.image} alt={item.name} className="w-full h-full object-cover" />}
+                                      <div className="w-10 h-10 bg-gray-100 rounded overflow-hidden flex items-center justify-center">
+                                        {item.productId?.images?.[0]?.url ? (
+                                          <img src={item.productId.images[0].url} alt={item.title} className="w-full h-full object-cover" />
+                                        ) : (
+                                          <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                          </svg>
+                                        )}
                                       </div>
                                       <div>
-                                        <p className="text-sm font-medium text-gray-900">{item.name}</p>
+                                        <p className="text-sm font-medium text-gray-900">{item.title || item.productId?.title}</p>
                                         <p className="text-xs text-gray-500">₹{item.price} x {item.quantity}</p>
                                       </div>
                                     </div>
@@ -274,18 +291,35 @@ const MyOrders = () => {
                                   <span className="text-gray-900">₹{order.subtotal?.toFixed(2) || '0.00'}</span>
                                 </div>
                                 <div className="flex justify-between text-sm mb-1">
-                                  <span className="text-gray-600">Shipping</span>
-                                  <span className="text-gray-900">₹{order.shipping?.toFixed(2) || '0.00'}</span>
-                                </div>
-                                <div className="flex justify-between text-sm mb-1">
                                   <span className="text-gray-600">Tax</span>
                                   <span className="text-gray-900">₹{order.tax?.toFixed(2) || '0.00'}</span>
                                 </div>
                                 <div className="flex justify-between text-sm font-bold border-t border-gray-200 pt-2 mt-2">
                                   <span className="text-gray-900">Total</span>
-                                  <span className="text-gray-900">₹{order.total?.toFixed(2) || '0.00'}</span>
+                                  <span className="text-gray-900">₹{order.totalAmount?.toFixed(2) || '0.00'}</span>
                                 </div>
                               </div>
+
+                              {/* Payment Info */}
+                              {order.payment && (
+                                <div className="bg-white p-3 rounded-lg border border-gray-200">
+                                  <p className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Payment</p>
+                                  <div className="flex justify-between text-sm mb-1">
+                                    <span className="text-gray-600">Provider</span>
+                                    <span className="text-gray-900 uppercase">{order.payment.provider}</span>
+                                  </div>
+                                  <div className="flex justify-between text-sm mb-1">
+                                    <span className="text-gray-600">Transaction ID</span>
+                                    <span className="text-gray-900 font-mono text-xs">{order.payment.transactionId}</span>
+                                  </div>
+                                  <div className="flex justify-between text-sm">
+                                    <span className="text-gray-600">Status</span>
+                                    <span className={`px-2 py-0.5 rounded text-xs font-bold uppercase ${order.payment.status === 'PAID' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}`}>
+                                      {order.payment.status}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
                             </div>
                           </motion.div>
                         )}
