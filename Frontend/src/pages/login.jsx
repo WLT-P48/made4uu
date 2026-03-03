@@ -22,7 +22,6 @@ const Login = () => {
     setError('');
     setSuccess('');
 
-    // --- TRIGGER THE RED ERROR BOXES ---
     if (!formData.email.trim()) {
       setError("Please enter your Email Address.");
       return;
@@ -50,15 +49,23 @@ const Login = () => {
   // --- Form Animations ---
   const fadeUp = {
     hidden: { opacity: 0, y: 15 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } }
+    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
   const staggerContainer = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+    visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
   };
 
-  // Hover animation for the brand name
+  // --- UPGRADED BUTTON ANIMATIONS ---
+  const primaryButtonHover = {
+    scale: 1.03,
+    boxShadow: "0px 15px 25px rgba(99, 102, 241, 0.4)", // Vibrant glowing shadow
+    transition: { type: "spring", stiffness: 400, damping: 10 }
+  };
+  
+  const buttonTap = { scale: 0.97 };
+
   const brandHover = {
     scale: 1.02,
     transition: { type: "spring", stiffness: 300, damping: 10 }
@@ -67,26 +74,26 @@ const Login = () => {
   return (
     <div className="relative min-h-screen flex flex-col md:flex-row bg-slate-50 font-sans overflow-hidden selection:bg-indigo-500 selection:text-white">
       
-      {/* --- Aurora Background Effect --- */}
+      {/* Background Aurora Effect */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <motion.div 
-          animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, -30, 0] }} 
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }} 
+          animate={{ scale: [1, 1.2, 1], x: [0, 50, 0], y: [0, -30, 0], rotate: [0, 45, 0] }} 
+          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut" }} 
           className="absolute top-[-10%] left-[-10%] w-[500px] h-[500px] bg-indigo-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-60" 
         />
         <motion.div 
-          animate={{ scale: [1, 1.5, 1], x: [0, -50, 0], y: [0, 50, 0] }} 
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 2 }} 
+          animate={{ scale: [1, 1.5, 1], x: [0, -50, 0], y: [0, 50, 0], rotate: [0, -45, 0] }} 
+          transition={{ duration: 22, repeat: Infinity, ease: "easeInOut", delay: 2 }} 
           className="absolute top-[20%] right-[-10%] w-[600px] h-[600px] bg-teal-200 rounded-full mix-blend-multiply filter blur-[120px] opacity-50" 
         />
         <motion.div 
-          animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, 50, 0] }} 
-          transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 4 }} 
+          animate={{ scale: [1, 1.2, 1], x: [0, 30, 0], y: [0, 50, 0], rotate: [0, 90, 0] }} 
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut", delay: 4 }} 
           className="absolute bottom-[-10%] left-[20%] w-[500px] h-[500px] bg-purple-200 rounded-full mix-blend-multiply filter blur-[100px] opacity-60" 
         />
       </div>
 
-      {/* Left Side - Branding (Desktop) */}
+      {/* Left Side Branding */}
       <div className="hidden md:flex md:w-1/2 flex-col justify-center items-start p-16 lg:p-24 relative z-10">
         <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
           <motion.h1 
@@ -102,7 +109,7 @@ const Login = () => {
         </motion.div>
       </div>
 
-      {/* Right Side - Form */}
+      {/* Right Side Form */}
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 relative z-10">
         <motion.div 
           variants={staggerContainer} 
@@ -110,7 +117,7 @@ const Login = () => {
           animate="visible" 
           className="w-full max-w-md"
         >
-          {/* Mobile Header (Responsive) */}
+          {/* Mobile Header */}
           <motion.div variants={fadeUp} className="mb-10 md:hidden text-left">
             <motion.h1 
                 className="text-4xl font-black text-slate-900 tracking-tight mb-2 cursor-default inline-block"
@@ -129,20 +136,20 @@ const Login = () => {
           <form onSubmit={handleSubmit} className="space-y-6">
             <AnimatePresence mode="wait">
               {success && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="text-sm font-medium text-indigo-800 bg-indigo-50 p-4 rounded-lg text-center border border-indigo-100">
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="text-sm font-medium text-indigo-800 bg-indigo-50 p-4 rounded-lg text-center border border-indigo-100 shadow-sm">
                   {success}
                 </motion.div>
               )}
               {error && (
-                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="text-sm font-medium text-red-800 bg-red-50 p-4 rounded-lg text-center border border-red-100">
+                <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="text-sm font-medium text-red-800 bg-red-50 p-4 rounded-lg text-center border border-red-100 shadow-sm">
                   {error}
                 </motion.div>
               )}
             </AnimatePresence>
             
-            <motion.div variants={fadeUp} className="space-y-8">
-              {/* Floating Label Input - Email */}
-              <div className="relative">
+            <div className="space-y-8">
+              {/* Inputs */}
+              <motion.div variants={fadeUp} className="relative">
                 <input
                   type="email"
                   name="email"
@@ -154,10 +161,9 @@ const Login = () => {
                 <label className="absolute left-0 -top-3.5 text-slate-500 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-slate-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-indigo-600">
                   Email Address
                 </label>
-              </div>
+              </motion.div>
 
-              {/* Floating Label Input - Password */}
-              <div className="relative">
+              <motion.div variants={fadeUp} className="relative">
                 <input
                   type="password"
                   name="password"
@@ -169,46 +175,64 @@ const Login = () => {
                 <label className="absolute left-0 -top-3.5 text-slate-500 text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-slate-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-indigo-600">
                   Password
                 </label>
-              </div>
-            </motion.div>
+              </motion.div>
+            </div>
 
             <motion.div variants={fadeUp} className="pt-6">
-              <button
+              {/* --- STUNNING GRADIENT BUTTON --- */}
+              <motion.button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-slate-900 text-white font-semibold py-4 rounded-lg hover:bg-indigo-600 transition-all duration-300 shadow-lg shadow-slate-200 hover:shadow-indigo-200 disabled:opacity-50"
+                whileHover={primaryButtonHover}
+                whileTap={buttonTap}
+                className="w-full relative flex items-center justify-center overflow-hidden bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500 bg-[length:200%_auto] hover:bg-[position:right_center] text-white font-bold text-lg py-4 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.2)] transition-all duration-500 disabled:opacity-70"
               >
                 {loading ? 'Processing...' : 'Sign In'}
-              </button>
+              </motion.button>
             </motion.div>
           </form>
 
           {/* Divider */}
           <motion.div variants={fadeUp} className="my-8 flex items-center">
             <div className="flex-1 border-t border-slate-200"></div>
-            <span className="px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Or continue with</span>
+            <span className="px-4 text-xs font-bold text-slate-400 uppercase tracking-widest">Or</span>
             <div className="flex-1 border-t border-slate-200"></div>
           </motion.div>
+
+          {/* {Oauth} */}
   
-          {/* Google Auth */}
-          <motion.div variants={fadeUp} className="flex justify-center w-full shadow-sm hover:shadow-md transition-shadow rounded-lg">
-            <GoogleLogin
-              onSuccess={async (credentialResponse) => {
-                  try {
-                    const res = await axios.post('http://localhost:5000/api/user/google-login', { token: credentialResponse.credential });
-                    localStorage.setItem('token', res.data.token);
-                    localStorage.setItem('role', res.data.role); 
-                    setSuccess("Authentication successful.");
-                    setTimeout(() => navigate("/"), 1000);
-                  } catch (err) {
-                    setError("Google authentication failed.");
-                  }
-              }}
-              onError={() => setError('Google Login Failed')}
-              theme="outline"
-              size="large"
-              width="320"
-            />
+        <motion.div variants={fadeUp} className="flex justify-center w-full">
+            <motion.div 
+              whileHover={{ scale: 1.04, y: -3 }}
+              whileTap={{ scale: 0.97 }}
+              // This animates the gradient colors to slide across the border constantly
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="w-full max-w-[320px] rounded-full p-[2px] bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 bg-[length:200%_200%] shadow-[0_5px_15px_rgba(99,102,241,0.2)] hover:shadow-[0_10px_30px_rgba(99,102,241,0.4)]"
+            >
+              {/* Inner white wrapper to create the "border" effect */}
+              <div className="bg-white w-full rounded-full flex items-center justify-center overflow-hidden">
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                      try {
+                        const res = await axios.post('http://localhost:5000/api/user/google-login', { token: credentialResponse.credential });
+                        localStorage.setItem('token', res.data.token);
+                        localStorage.setItem('role', res.data.role); 
+                        setSuccess("Authentication successful.");
+                        setTimeout(() => navigate("/"), 1000);
+                      } catch (err) {
+                        setError("Google authentication failed.");
+                      }
+                  }}
+                  onError={() => setError('Google Login Failed')}
+                  theme="outline"
+                  shape="pill"
+                  text="continue_with"
+                  size="large"
+                  width="316"
+                />
+              </div>
+            </motion.div>
           </motion.div>
 
           {/* Toggle View */}
@@ -216,7 +240,7 @@ const Login = () => {
             Don't have an account?{' '}
             <button 
               onClick={() => navigate('/register')} 
-              className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors"
+              className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-indigo-600 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100"
             >
               Create one here
             </button>
