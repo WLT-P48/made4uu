@@ -1,9 +1,10 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useCart } from "../components/CartContext";
 import productService from "../services/product.service";
 import { HeartIcon as SolidHeart } from "@heroicons/react/24/solid";
 import { HeartIcon as OutlineHeart } from "@heroicons/react/24/outline";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 
 const ProductDetails = () => {
   const { id } = useParams();
@@ -12,21 +13,58 @@ const ProductDetails = () => {
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
+  const [images, setImages] = useState([]);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [suggestedProducts, setSuggestedProducts] = useState([]);
+  
+  // Touch/swipe support for image gallery
+  const touchStartX = useRef(0);
+  const touchEndX = useRef(0);
+  const imageContainerRef = useRef(null);
+
+  // Handle touch events for swipe gesture
+  const handleTouchStart = (e) => {
+    touchStartX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchMove = (e) => {
+    touchEndX.current = e.touches[0].clientX;
+  };
+
+  const handleTouchEnd = () => {
+    const swipeThreshold = 50;
+    const diff = touchStartX.current - touchEndX.current;
+    
+    if (Math.abs(diff) > swipeThreshold) {
+      if (diff > 0) {
+        // Swipe left - next image
+        handleNextImage();
+      } else {
+        // Swipe right - previous image
+        handlePreviousImage();
+      }
+    }
+    // Reset values
+    touchStartX.current = 0;
+    touchEndX.current = 0;
+  };
 
   useEffect(() => {
     fetchProduct();
   }, [id]);
 
-  const fetchProduct = async () => {
+const fetchProduct = async () => {
     try {
       setLoading(true);
       const result = await productService.getById(id);
 
       if (result.success) {
+        // Get all images (max 5) from the product
+        const productImages = (result.data.images || []).slice(0, 5).map(img => img.url);
+        
         const transformedProduct = {
           id: result.data._id,
           name: result.data.title,
@@ -36,14 +74,14 @@ const ProductDetails = () => {
           oldPrice: result.data.price,
           rating: result.data.rating || 0,
           reviews: result.data.reviewCount || 0,
-          img: result.data.images?.length > 0
-            ? result.data.images[0].url
-            : "/placeholder.jpg",
+          img: productImages.length > 0 ? productImages[0] : "/placeholder.jpg",
           description: result.data.description,
           stock: result.data.stock || 0,
         };
 
         setProduct(transformedProduct);
+        setImages(productImages.length > 0 ? productImages : ["/placeholder.jpg"]);
+        setSelectedImageIndex(0);
       } else {
         setError(result.error);
       }
@@ -52,6 +90,14 @@ const ProductDetails = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handlePreviousImage = () => {
+    setSelectedImageIndex((prev) => (prev > 0 ? prev - 1 : images.length - 1));
+  };
+
+  const handleNextImage = () => {
+    setSelectedImageIndex((prev) => (prev < images.length - 1 ? prev + 1 : 0));
   };
 
   useEffect(() => {
@@ -107,31 +153,94 @@ const ProductDetails = () => {
     <div className="bg-gray-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-10">
 
-        {/* MAIN SECTION */}
+{/* MAIN SECTION */}
         <div className="bg-white rounded-3xl shadow-lg p-6 sm:p-10 grid lg:grid-cols-2 gap-10">
 
-          {/* IMAGE SECTION */}
-          <div className="relative overflow-hidden rounded-2xl group">
-            <img
-              src={product.img}
-              alt={product.name}
-              className="w-full h-72 sm:h-96 object-cover transition duration-500 group-hover:scale-105"
-            />
-            {discount > 0 && (
-              <div className="absolute top-4 left-4 bg-red-500 text-white text-sm font-bold px-3 py-1 rounded-full shadow-lg">
-                {discount}% OFF
-              </div>
-            )}
-            <div
-              onClick={() => setLiked(!liked)}
-              className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"
+          {/* IMAGE SECTION - Flipkart Style */}
+          <div className="flex flex-col gap-4">
+            {/* Main Image Container */}
+            <div 
+              ref={imageContainerRef}
+              className="relative overflow-hidden rounded-2xl group bg-gray-100 touch-pan-y"
+              onTouchStart={handleTouchStart}
+              onTouchMove={handleTouchMove}
+              onTouchEnd={handleTouchEnd}
             >
-              {liked ? (
-                <SolidHeart className="h-6 w-6 text-red-500" />
-              ) : (
-                <OutlineHeart className="h-6 w-6 text-gray-600 hover:text-red-500 transition-colors" />
+              <img
+                src={images[selectedImageIndex]}
+                alt={product.name}
+                className="w-full h-80 sm:h-96 object-cover transition duration-500"
+              />
+              
+              {/* Discount Badge */}
+              {discount > 0 && (
+                <div className="absolute top-3 left-3 sm:top-4 sm:left-4 bg-red-500 text-white text-xs sm:text-sm font-bold px-2 py-1 sm:px-3 sm:py-1 rounded-full shadow-lg">
+                  {discount}% OFF
+                </div>
+              )}
+              
+              {/* Like Button */}
+              <div
+                onClick={() => setLiked(!liked)}
+                className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"
+              >
+                {liked ? (
+                  <SolidHeart className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" />
+                ) : (
+                  <OutlineHeart className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600 hover:text-red-500 transition-colors" />
+                )}
+              </div>
+
+              {/* Navigation Arrows - Always visible on mobile, hover on desktop */}
+              {images.length > 1 && (
+                <>
+                  <button
+                    onClick={handlePreviousImage}
+                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white shadow-lg p-1.5 sm:p-2 rounded-full opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all hover:bg-gray-100 z-10"
+                    aria-label="Previous image"
+                  >
+                    <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  </button>
+                  <button
+                    onClick={handleNextImage}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white shadow-lg p-1.5 sm:p-2 rounded-full opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all hover:bg-gray-100 z-10"
+                    aria-label="Next image"
+                  >
+                    <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
+                  </button>
+                </>
+              )}
+
+              {/* Image Counter */}
+              {images.length > 1 && (
+                <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 bg-black/70 text-white text-xs font-semibold px-2 py-1 sm:px-3 sm:py-1 rounded-full">
+                  {selectedImageIndex + 1}/{images.length}
+                </div>
               )}
             </div>
+
+            {/* Thumbnail Gallery - Visible on tablet and desktop only */}
+            {images.length > 1 && (
+              <div className="hidden lg:flex gap-2 sm:gap-3 overflow-x-auto pb-2 justify-center scrollbar-hide px-1">
+                {images.map((img, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`relative flex-shrink-0 w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      selectedImageIndex === index
+                        ? "border-blue-600 ring-2 ring-blue-600 ring-opacity-50"
+                        : "border-gray-200 hover:border-gray-400"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`${product.name} ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* DETAILS */}

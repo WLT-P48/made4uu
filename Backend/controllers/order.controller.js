@@ -36,6 +36,14 @@ const createOrder = async (req, res) => {
     // Generate simple order number
     const orderNumber = "ORD" + Date.now();
 
+    // Determine paymentStatus based on payment method
+    let paymentStatus = "UNPAID";
+    if (payment && payment.provider === "razorpay" && payment.status === "PAID") {
+      paymentStatus = "PAID";
+    } else if (payment && payment.provider === "cash_on_delivery") {
+      paymentStatus = "CASH_ON_DELIVERY";
+    }
+
     const order = await Order.create({
       orderNumber,
       userId,
@@ -45,6 +53,7 @@ const createOrder = async (req, res) => {
       totalAmount,
       shippingAddressId,
       payment,
+      paymentStatus,
       status: "PLACED"
     });
 
@@ -122,7 +131,7 @@ const updateOrderStatus = async (req, res) => {
     const { id } = req.params;
     const { status } = req.body;
 
-    if (!["PLACED","PAID","SHIPPED","DELIVERED","CANCELLED"].includes(status)) {
+    if (!["PLACED","SHIPPED","DELIVERED","CANCELLED"].includes(status)) {
       return res.status(400).json({ message: "Invalid status" });
     }
 

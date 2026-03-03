@@ -20,6 +20,7 @@ const Checkout = () => {
   const [error, setError] = useState("");
   const [showAddressManager, setShowAddressManager] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(null);
+  const [paymentMethod, setPaymentMethod] = useState("razorpay");
 
   // Order summary calculations
   const taxRate = 0.1;
@@ -118,16 +119,22 @@ const Checkout = () => {
         quantity: item.quantity
       }));
 
-      // Create order data
+      // Create order data based on payment method
       const orderData = {
         userId,
         items,
         shippingAddressId: selectedAddress._id,
-        payment: {
-          provider: "razorpay",
-          transactionId: "TXN" + Date.now(), // In real app, this would come from Razorpay
-          status: "PAID" // Assuming payment is successful (in real app, verify with Razorpay)
-        }
+        payment: paymentMethod === "cash_on_delivery" 
+          ? {
+              provider: "cash_on_delivery",
+              transactionId: null,
+              status: "PENDING"
+            }
+          : {
+              provider: "razorpay",
+              transactionId: "TXN" + Date.now(),
+              status: "PAID"
+            }
       };
 
       const result = await orderService.createOrder(orderData);
@@ -370,17 +377,38 @@ const Checkout = () => {
                 </div>
               </div>
 
-              {/* Payment Info */}
-              <div className="mb-6 p-4 bg-gray-50 rounded-xl">
-                <div className="flex items-center gap-3 mb-2">
-                  <svg className="w-8 h-8 text-gray-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <rect x="1" y="4" width="22" height="16" rx="2" strokeWidth="2" />
-                    <line x1="1" y1="10" x2="23" y2="10" strokeWidth="2" />
-                  </svg>
-                  <div>
-                    <p className="font-semibold text-gray-900">Pay with Razorpay</p>
-                    <p className="text-xs text-gray-500">Secure payment via Razorpay</p>
-                  </div>
+              {/* Payment Method Selection */}
+              <div className="mb-6">
+                <h3 className="font-semibold text-gray-900 mb-3">Payment Method</h3>
+                <div className="space-y-2">
+                  <label className={`flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === "razorpay" ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="razorpay"
+                      checked={paymentMethod === "razorpay"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-black border-gray-300 focus:ring-black"
+                    />
+                    <div className="ml-3">
+                      <p className="font-semibold text-gray-900">Pay with Razorpay</p>
+                      <p className="text-xs text-gray-500">Secure payment via Razorpay</p>
+                    </div>
+                  </label>
+                  <label className={`flex items-center p-3 border-2 rounded-xl cursor-pointer transition-all ${paymentMethod === "cash_on_delivery" ? "border-black bg-gray-50" : "border-gray-200 hover:border-gray-300"}`}>
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      value="cash_on_delivery"
+                      checked={paymentMethod === "cash_on_delivery"}
+                      onChange={(e) => setPaymentMethod(e.target.value)}
+                      className="w-4 h-4 text-black border-gray-300 focus:ring-black"
+                    />
+                    <div className="ml-3">
+                      <p className="font-semibold text-gray-900">Cash on Delivery</p>
+                      <p className="text-xs text-gray-500">Pay when you receive the order</p>
+                    </div>
+                  </label>
                 </div>
               </div>
 

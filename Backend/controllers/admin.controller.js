@@ -69,6 +69,68 @@ const getDashboardStats = async (req, res) => {
 };
 
 /**
+ * Get product status statistics for dashboard
+ */
+const getProductStatusStats = async (req, res) => {
+  try {
+    // Get counts for different product statuses
+    const activeWithGoodStock = await Product.countDocuments({ 
+      isActive: true, 
+      isDeleted: false,
+      stock: { $gt: 10 }
+    });
+    
+    const lowStock = await Product.countDocuments({ 
+      isActive: true, 
+      isDeleted: false,
+      stock: { $gt: 0, $lte: 10 }
+    });
+    
+    const outOfStock = await Product.countDocuments({ 
+      isActive: true, 
+      isDeleted: false,
+      stock: { $lte: 0 }
+    });
+    
+    const inactiveProducts = await Product.countDocuments({ 
+      isActive: false, 
+      isDeleted: false
+    });
+
+    res.json({
+      activeWithGoodStock,
+      lowStock,
+      outOfStock,
+      inactiveProducts
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Get order status statistics for dashboard
+ */
+const getOrderStatusStats = async (req, res) => {
+  try {
+    // Get counts for different order statuses
+    const placedOrders = await Order.countDocuments({ status: "PLACED" });
+    const shippedOrders = await Order.countDocuments({ status: "SHIPPED" });
+    const deliveredOrders = await Order.countDocuments({ status: "DELIVERED" });
+    const cancelledOrders = await Order.countDocuments({ status: "CANCELLED" });
+
+    res.json({
+      placed: placedOrders,
+      shipped: shippedOrders,
+      delivered: deliveredOrders,
+      cancelled: cancelledOrders
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
  * Get system status (MongoDB and Cloudinary)
  */
 const getSystemStatus = async (req, res) => {
@@ -112,7 +174,85 @@ const getSystemStatus = async (req, res) => {
   }
 };
 
+/**
+ * Get all users (Admin)
+ */
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find().select('-password').sort({ date: -1 });
+    res.json(users);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Get user by ID (Admin)
+ */
+const getUserById = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Update user role (Admin)
+ */
+const updateUserRole = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { role } = req.body;
+
+    if (!['Customer', 'Admin'].includes(role)) {
+      return res.status(400).json({ message: "Invalid role" });
+    }
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    user.role = role;
+    await user.save();
+
+    res.json({ message: "User role updated", user: { ...user._doc, password: undefined } });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Delete user (Admin)
+ */
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    await User.findByIdAndDelete(id);
+    res.json({ message: "User deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   getDashboardStats,
-  getSystemStatus
+  getProductStatusStats,
+  getOrderStatusStats,
+  getSystemStatus,
+  getAllUsers,
+  getUserById,
+  updateUserRole,
+  deleteUser
 };
