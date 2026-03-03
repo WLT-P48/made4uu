@@ -1,12 +1,10 @@
 import React, { useState } from "react";
 import { useCart } from "../CartContext";
 
-
-export default function Navbar({ setIsCartOpen }) {
+export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const currentPath = window.location.pathname;
-
-  const { cart } = useCart();
+  const { cartCount } = useCart();
 
   const navLinks = [
     {
@@ -69,7 +67,6 @@ export default function Navbar({ setIsCartOpen }) {
   const isActive = (href) => currentPath === href;
 
   return (
-
     <nav className="sticky top-0 z-50 w-full bg-white/90 backdrop-blur-md shadow-md">
       <div className="px-6">
         <div className="flex h-16 items-center justify-between">
@@ -123,29 +120,29 @@ export default function Navbar({ setIsCartOpen }) {
                   }
                 `}
               >
-                {link.icon}
+                {link.name === "Cart" ? (
+                  <div className="relative">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2 3h2l2.4 12.4a2 2 0 0 0 2 1.6h8.4a2 2 0 0 0 2-1.6L21 7H6" />
+                      <circle cx="9" cy="21" r="1" />
+                      <circle cx="17" cy="21" r="1" />
+                    </svg>
+                    {cartCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                        {cartCount > 9 ? "9+" : cartCount}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  link.icon
+                )}
 
                 {isActive(link.href) && (
                   <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-indigo-600 rounded-full" />
                 )}
               </a>
             ))}
-
-            {/* 🛒 CART ICON */}
-            <button
-              onClick={() => setIsCartOpen(true)}
-              className="relative text-2xl hover:scale-110 transition"
-            >
-              🛒
-
-              {cart?.length > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 flex items-center justify-center rounded-full">
-                  {cart.length}
-                </span>
-              )}
-            </button>
           </div>
-
 
           {/* Mobile menu button */}
           <button
@@ -160,7 +157,6 @@ export default function Navbar({ setIsCartOpen }) {
               )}
             </svg>
           </button>
-
         </div>
       </div>
 

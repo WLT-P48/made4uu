@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const multer = require("multer");
+const { testCloudinaryConnection } = require("./config/cloudinary");
 
 // Routes
 const authRoute = require("./routes/auth.routes");
@@ -11,6 +13,7 @@ const orderRoutes = require("./routes/order.routes");
 const addressRoutes = require("./routes/address.routes");
 const cartRoutes = require("./routes/cart.routes");
 const activityLogRoutes = require("./routes/activityLog.routes");
+const adminRoutes = require("./routes/admin.routes");
 
 const app = express();
 
@@ -23,6 +26,9 @@ app.use(cors());
 
 // Parse JSON body
 app.use(express.json());
+
+// Parse multipart/form-data (for file uploads)
+app.use(express.urlencoded({ extended: true }));
 
 // Security headers (basic)
 app.use((req, res, next) => {
@@ -42,13 +48,14 @@ app.get("/", (req, res) => {
 });
 
 // API routes
-app.use("/api/user", authRoute); // <-- Your login endpoint (/api/user/register etc.)
+app.use("/api/user", authRoute);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/activity-logs", activityLogRoutes);
+app.use("/api/admin", adminRoutes);
 
 /* ===========================
    ERROR HANDLER
@@ -71,8 +78,17 @@ const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 5000;
 
 // Start server first
-app.listen(PORT, () => {
+app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
+
+  // Test Cloudinary connection on startup
+  console.log('Testing Cloudinary connection...');
+  const cloudinaryTest = await testCloudinaryConnection();
+  if (cloudinaryTest.success) {
+    console.log('✅ Cloudinary connection successful!');
+  } else {
+    console.error('❌ Cloudinary connection failed:', cloudinaryTest.error);
+  }
 
   // Connect to MongoDB
   mongoose

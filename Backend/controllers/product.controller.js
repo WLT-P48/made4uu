@@ -1,5 +1,7 @@
 const Product = require('../models/product.model');
 const Category = require('../models/category.model');
+const mongoose = require('mongoose');
+const { cloudinary, isCloudinaryConfigured } = require('../config/cloudinary');
 
 /**
  * Create Product (Admin)
@@ -20,10 +22,15 @@ const createProduct = async (req, res) => {
       isActive
     } = req.body;
 
-    // Validate category
+    // Validate categoryId is a valid MongoDB ObjectId format
+    if (!categoryId || !mongoose.isValidObjectId(categoryId)) {
+      return res.status(400).json({ message: 'Invalid category ID format. Please select a valid category.' });
+    }
+
+    // Validate category exists and is active
     const category = await Category.findById(categoryId);
     if (!category || !category.isActive) {
-      return res.status(400).json({ message: 'Invalid or inactive category' });
+      return res.status(400).json({ message: 'Invalid or inactive category. Please select a valid active category.' });
     }
 
     const product = await Product.create({
@@ -51,13 +58,13 @@ const createProduct = async (req, res) => {
  */
 const getAllProducts = async (req, res) => {
   try {
-    const {
+const {
       page = 1,
       limit = 10,
       minPrice,
       maxPrice,
       categoryId,
-      isActive = true
+      isActive
     } = req.query;
 
     const query = {
@@ -83,6 +90,13 @@ const getAllProducts = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip((page - 1) * limit)
       .limit(Number(limit));
+
+    // Sort images by imageNumber for each product
+    products.forEach(product => {
+      if (product.images && product.images.length > 0) {
+        product.images.sort((a, b) => a.imageNumber - b.imageNumber);
+      }
+    });
 
     const total = await Product.countDocuments(query);
 
@@ -111,6 +125,11 @@ const getProductById = async (req, res) => {
       return res.status(404).json({ message: 'Product not found' });
     }
 
+    // Sort images by imageNumber
+    if (product.images && product.images.length > 0) {
+      product.images.sort((a, b) => a.imageNumber - b.imageNumber);
+    }
+
     res.json(product);
   } catch (error) {
     res.status(500).json({ message: error.message });
@@ -129,6 +148,13 @@ const getProductsByCategory = async (req, res) => {
       isActive: true,
       isDeleted: false
     }).populate('categoryId', 'name slug');
+
+    // Sort images by imageNumber for each product
+    products.forEach(product => {
+      if (product.images && product.images.length > 0) {
+        product.images.sort((a, b) => a.imageNumber - b.imageNumber);
+      }
+    });
 
     res.json(products);
   } catch (error) {
@@ -201,6 +227,158 @@ const updateProductStock = async (req, res) => {
   }
 };
 
+/**
+ * Upload product images to Cloudinary
+ */
+const uploadProductImages = async (req, res) => {
+  try {
+    // First, check if Cloudinary is properly configured
+    if (!isCloudinaryConfigured()) {
+      console.error('Cloudinary is not configured properly');
+      return res.status(500).json({ message: 'Cloudinary is not configured. Please check server configuration.' });
+    }
+
+    const product = await Product.findById(req.params.id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({ message: 'No files uploaded' });
+    }
+
+    console.log('Uploaded files:', req.files);
+
+    // Get the starting image number (next available number)
+    const startImageNumber = product.images.length + 1;
+
+    // Process uploaded files and add to product images with sequential numbers
+    const newImages = req.files.map((file, index) => {
+      // Cloudinary stores the public_id in 'filename' and URL in 'path'
+      // Also check for 'secure_url' which is the HTTPS URL from Cloudinary response
+      const imageId = file.filename || file.public_id;
+      const url = file.path || file.secure_url || file.url;
+
+      console.log('Processing file:', { imageId, url, file });
+
+      return {
+        imageId: imageId,
+        url: url,
+        imageNumber: startImageNumber + index // Assign sequential numbers
+      };
+    });
+
+    // Filter out any invalid images (missing imageId or url)
+    const validImages = newImages.filter(img => img.imageId && img.url);
+
+    if (validImages.length === 0) {
+      console.error('No valid images after processing:', newImages);
+      return res.status(500).json({ message: 'Failed to process uploaded images. Please try again.' });
+    }
+
+    product.images.push(...validImages);
+    await product.save();
+
+    console.log('Images saved to product:', product.images);
+
+    res.status(200).json({
+      message: 'Images uploaded successfully',
+      images: product.images
+    });
+  } catch (error) {
+    console.error('Error uploading product images:', error);
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Delete a specific product image
+ */
+const deleteProductImage = async (req, res) => {
+  try {
+    const { id, imageId } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    // Find the image in the product's images array
+    const imageIndex = product.images.findIndex(img => img.imageId === imageId);
+    
+    if (imageIndex === -1) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+
+    // Delete from Cloudinary
+    try {
+      await cloudinary.uploader.destroy(imageId);
+    } catch (cloudinaryError) {
+      console.error('Cloudinary deletion error:', cloudinaryError);
+      // Continue even if Cloudinary deletion fails
+    }
+
+    // Remove from product images array
+    product.images.splice(imageIndex, 1);
+    await product.save();
+
+    res.status(200).json({
+      message: 'Image deleted successfully',
+      images: product.images
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Get a specific product image by imageId
+ */
+const getProductImageById = async (req, res) => {
+  try {
+    const { id, imageId } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const image = product.images.find(img => img.imageId === imageId);
+    
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+
+    res.json(image);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+/**
+ * Get a specific product image by imageNumber
+ */
+const getProductImageByNumber = async (req, res) => {
+  try {
+    const { id, imageNumber } = req.params;
+
+    const product = await Product.findById(id);
+    if (!product) {
+      return res.status(404).json({ message: 'Product not found' });
+    }
+
+    const image = product.images.find(img => img.imageNumber === parseInt(imageNumber));
+    
+    if (!image) {
+      return res.status(404).json({ message: 'Image not found' });
+    }
+
+    res.json(image);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 module.exports = {
   createProduct,
   getAllProducts,
@@ -208,5 +386,9 @@ module.exports = {
   getProductsByCategory,
   updateProduct,
   deleteProduct,
-  updateProductStock
+  updateProductStock,
+  uploadProductImages,
+  deleteProductImage,
+  getProductImageById,
+  getProductImageByNumber
 };

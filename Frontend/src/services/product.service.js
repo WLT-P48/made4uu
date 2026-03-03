@@ -128,6 +128,27 @@ const productService = {
     }
   },
 
+  // Upload product images (admin)
+  async uploadImages(productId, formData) {
+    try {
+      const response = await httpClient.post(
+        `/products/${productId}/images`,
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Failed to upload images',
+      };
+    }
+  },
+
   // Get product reviews
   async getReviews(productId, params = {}) {
     try {

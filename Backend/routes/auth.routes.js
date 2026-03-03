@@ -3,6 +3,7 @@ const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { OAuth2Client } = require('google-auth-library');
+const auth = require('../middleware/auth');
 
 // Your actual Google Client ID
 const CLIENT_ID = "198473426738-d0o59tf5mr4q7jpl4lgae0qh13mi7ilh.apps.googleusercontent.com";
@@ -70,6 +71,60 @@ router.post('/google-login', async (req, res) => {
     } catch (err) {
         console.error("Google Auth Error:", err.message); 
         res.status(400).json({ message: "Google Auth Failed" });
+    }
+});
+
+// --- PROFILE ROUTES ---
+
+// GET USER PROFILE
+router.get('/profile', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user._id).select('-password');
+        if (!user) return res.status(404).json({ message: 'User not found' });
+        // Explicitly include googleId to determine login method
+        res.json({
+            _id: user._id,
+            username: user.username,
+            email: user.email,
+            role: user.role,
+            googleId: user.googleId,
+            date: user.date
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+});
+
+// UPDATE USER PROFILE
+router.put('/profile', auth, async (req, res) => {
+    try {
+        const { username, email } = req.body;
+        
+        const user = await User.findById(req.user._id);
+        if (!user) return res.status(404).json({ message: 'User not found' });
+
+        // Check if email is being changed and if it's already taken
+        if (email && email !== user.email) {
+            const emailExist = await User.findOne({ email });
+            if (emailExist) return res.status(400).json({ message: 'Email already exists' });
+        }
+
+        // Update basic fields
+        if (username) user.username = username;
+        if (email) user.email = email;
+
+        await user.save();
+        res.json({ 
+            message: 'Profile updated successfully',
+            user: {
+                _id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role
+            }
+        });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
     }
 });
 
