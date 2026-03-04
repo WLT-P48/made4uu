@@ -13,12 +13,18 @@ const createOrder = async (req, res) => {
       return res.status(400).json({ message: "Order must have at least one item" });
     }
 
-    // Calculate subtotal
+    // Calculate subtotal and validate stock
     let subtotal = 0;
     for (const item of items) {
       const product = await Product.findById(item.productId);
       if (!product || product.isDeleted || !product.isActive) {
         return res.status(400).json({ message: `Invalid product: ${item.title}` });
+      }
+      // Check if sufficient stock is available
+      if (product.stock < item.quantity) {
+        return res.status(400).json({ 
+          message: `Insufficient stock for ${item.title}. Available: ${product.stock}` 
+        });
       }
       item.price = product.price; // ensure price is current
       subtotal += item.price * item.quantity;
@@ -41,6 +47,13 @@ const createOrder = async (req, res) => {
       payment,
       status: "PLACED"
     });
+
+    // Decrease stock for each item in the order
+    for (const item of items) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { stock: -item.quantity }
+      });
+    }
 
     res.status(201).json(order);
   } catch (error) {
@@ -141,6 +154,13 @@ const cancelOrder = async (req, res) => {
 
     if (order.status === "CANCELLED" || order.status === "DELIVERED") {
       return res.status(400).json({ message: "Cannot cancel this order" });
+    }
+
+    // Restore stock for each item in the order
+    for (const item of order.items) {
+      await Product.findByIdAndUpdate(item.productId, {
+        $inc: { stock: item.quantity }
+      });
     }
 
     order.status = "CANCELLED";

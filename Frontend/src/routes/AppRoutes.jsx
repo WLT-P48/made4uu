@@ -1,7 +1,5 @@
-import { createBrowserRouter } from "react-router-dom";
-<<<<<<< HEAD
-import Products from "../pages/Products";
-=======
+import { createBrowserRouter, Navigate } from "react-router-dom";
+
 import Layout from "../app/Layout";
 import Home from "../app/Home";
 import PageNotFound from "../app/PageNotFound";
@@ -11,60 +9,51 @@ import Cart from "../pages/cart";
 import Checkout from "../pages/checkout";
 import Profile from "../pages/profile";
 import Aboutus from "../pages/Aboutus";
-import Products from "../components/product";
->>>>>>> main
+import Contact from "../pages/Contact";
+import Products from "../pages/products";
 import ProductDetails from "../pages/ProductDetails";
+import MyOrders from "../pages/MyOrders";
+
+// ADMIN
+import AdminLayout from "../pages/adminPages/AdminLayout";
+import AdminDashboard from "../pages/adminPages/AdminDashboard";
+import CreateProduct from "../pages/adminPages/CreateProduct";
+import UpdateProduct from "../pages/adminPages/UpdateProduct";
+import DeleteProduct from "../pages/adminPages/DeleteProduct";
 
 const AppRoutes = createBrowserRouter([
   {
     path: "/",
-    element: <Products />,
-  },
-  {
-    path: "/product/:id",
-    element: <ProductDetails />,
-  },
-<<<<<<< HEAD
-=======
-  {
-    path: "/",
     element: <Layout />,
     children: [
+      { index: true, element: <Home /> },
+      { path: "login", element: <Login /> },
+      { path: "register", element: <Register /> },
+      { path: "cart", element: <Cart /> },
+      { path: "checkout", element: <Checkout /> },
+      { path: "profile", element: <Profile /> },
+      { path: "orders", element: <MyOrders /> },
+      { path: "about-us", element: <Aboutus /> },
+      { path: "contact", element: <Contact /> },
+      { path: "products", element: <Products /> },
+      { path: "product/:id", element: <ProductDetails /> },
+
       {
-        index: true,
-        element: <Home />
-      },
-      {
-        path: "login",
-        element: <Login />
-      },
-      {
-        path: "register",
-        element: <Register />
-      },
-      {
-        path: "cart",
-        element: <Cart />
-      },
-      {
-        path: "checkout",
-        element: <Checkout />
-      },
-      {
-        path: "profile",
-        element: <Profile />
-      },
-      {
-        path: "about-us",
-        element:<Aboutus />
-      },
-      {
-        path: "*",
-        element: <PageNotFound />
+        path: "admin",
+        element: <AdminLayout />,
+        children: [
+          { index: true, element: <Navigate to="dashboard" replace /> },
+          { path: "dashboard", element: <AdminDashboard /> },
+          { path: "products", element: <AdminDashboard /> },
+          { path: "products/create", element: <CreateProduct /> },
+          { path: "products/update", element: <UpdateProduct /> },
+          { path: "products/delete", element: <DeleteProduct /> }
+        ]
       }
     ]
-  }
->>>>>>> main
+  },
+
+  { path: "*", element: <PageNotFound /> }
 ]);
 
 export default AppRoutes;
