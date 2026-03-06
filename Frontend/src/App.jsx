@@ -1,16 +1,29 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { RouterProvider } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { CartProvider } from "./components/CartContext";
+
+import Loader from "./components/common/Loader";
 import AppRoutes from "./routes/AppRoutes";
-import "./App.css";
 
 function App() {
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000); // loader for 1 second
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (loading) {
+    return <Loader />;
+  }
+
   return (
-    <GoogleOAuthProvider clientId="198473426738-d0o59tf5mr4q7jpl4lgae0qh13mi7ilh.apps.googleusercontent.com">
-      <CartProvider>
-        <RouterProvider router={AppRoutes} />
-      </CartProvider>
+    <GoogleOAuthProvider clientId="1234567890-abc123.apps.googleusercontent.com">
+      <RouterProvider router={AppRoutes} />
     </GoogleOAuthProvider>
   );
 }
