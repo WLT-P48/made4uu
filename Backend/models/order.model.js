@@ -45,7 +45,7 @@ const orderSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["PLACED", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"],
+    enum: ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"],
     default: "PLACED"
   },
 
@@ -58,11 +58,16 @@ const orderSchema = new mongoose.Schema({
   payment: {
     provider: {
       type: String,
-      required: true,
-      enum: ["razorpay"] // extendable for other providers
+      enum: ["razorpay", "cash_on_delivery"] // extendable for other providers
     },
-    transactionId: { type: String, required: true },
-    status: { type: String, required: true }
+    transactionId: { type: String },
+    status: { type: String }
+  },
+
+  paymentStatus: {
+    type: String,
+    enum: ["PAID", "UNPAID", "CASH_ON_DELIVERY"],
+    default: "UNPAID"
   },
 
   createdAt: {

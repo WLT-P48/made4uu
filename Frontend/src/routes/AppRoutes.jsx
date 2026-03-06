@@ -1,6 +1,6 @@
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import Layout from "../app/Layout";
-import Home from "../app/Home";
+import Home from "../app/home/Home";
 import PageNotFound from "../app/PageNotFound";
 import Login from "../pages/login";
 import Register from "../pages/register";
@@ -16,6 +16,8 @@ import MyOrders from "../pages/MyOrders";
 // ADMIN
 import AdminLayout from "../pages/adminPages/AdminLayout";
 import AdminDashboard from "../pages/adminPages/AdminDashboard";
+import AdminOrders from "../pages/adminPages/AdminOrders";
+import AdminUsers from "../pages/adminPages/AdminUsers";
 import CreateProduct from "../pages/adminPages/CreateProduct";
 import UpdateProduct from "../pages/adminPages/UpdateProduct";
 import DeleteProduct from "../pages/adminPages/DeleteProduct";
@@ -44,6 +46,8 @@ const AppRoutes = createBrowserRouter([
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
           { path: "dashboard", element: <AdminDashboard /> },
+          { path: "orders", element: <AdminOrders /> },
+          { path: "users", element: <AdminUsers /> },
           { path: "products", element: <AdminDashboard /> },
           { path: "products/create", element: <CreateProduct /> },
           { path: "products/update", element: <UpdateProduct /> },
