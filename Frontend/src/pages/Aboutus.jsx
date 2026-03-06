@@ -2,8 +2,8 @@ import React from 'react';
 
 const aboutData = {
   title: 'Made4UU',
-  description: 'Made4UU is a modern MERN stack e-commerce platform built with MongoDB, Express.js, React, and Node.js. We empower shoppers with seamless browsing, secure checkout, personalized recommendations, and fast delivery across categories like fashion, electronics, and home essentials.',
-  mission: 'Our mission is to make online shopping accessible, affordable, and tailored just for you—because every product is made4UU.',
+  description: 'Modern e-commerce platform for fashion, electronics & home essentials with secure checkout & fast delivery.',
+  mission: 'Our mission is to make online shopping accessible, affordable, tailored just for you because every product is made4UU.',
   founded: '2025',
   tagline: 'Shopping made personal, just for U.',
   team: [
@@ -43,28 +43,25 @@ const aboutData = {
 export default function Aboutus() {
   return (
     <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Hero Section */}
-      <section className="max-w-7xl mx-auto text-center mb-24">
-        <div className="mb-12">
-          <h1 className="text-6xl md:text-7xl font-black bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
-            {aboutData.title}
-          </h1>
-          <p className="text-xl md:text-2xl text-gray-700 max-w-4xl mx-auto leading-relaxed">
-            {aboutData.description}
-          </p>
-          <p className="text-2xl font-semibold text-blue-600 mt-4 italic">
-            "{aboutData.tagline}"
-          </p>
-        </div>
-        
-        <div className="max-w-5xl mx-auto">
-          <img 
-            src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1400&h=700&fit=crop" 
-            alt="Made4UU E-commerce Platform"
-            className="w-full rounded-3xl shadow-2xl object-cover h-80 md:h-96 lg:h-125"
-          />
-        </div>
-      </section>
+      {/* Hero Section - Minimalist */}
+<section className="max-w-4xl mx-auto text-center mb-20 px-4">
+  <h1 className="text-5xl md:text-7xl font-black bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
+    {aboutData.title}
+  </h1>
+  <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed mb-6 px-4">
+    {aboutData.description}
+  </p>
+  <p className="text-xl font-semibold text-blue-600 italic mb-12">
+    "{aboutData.tagline}"
+  </p>
+  <div className="w-full max-w-3xl mx-auto">
+    <img 
+      src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=500&fit=crop" 
+      alt="Made4UU"
+      className="w-full rounded-2xl shadow-xl object-cover h-64 md:h-80"
+    />
+  </div>
+</section>
 
       {/* Mission Section */}
       <section className="max-w-4xl mx-auto text-center mb-24">
@@ -74,7 +71,7 @@ export default function Aboutus() {
             {aboutData.mission}
           </p>
           <p className="text-xl text-gray-600">
-            Founded in <span className="font-bold text-blue-600">{aboutData.founded}</span>, we're committed to revolutionizing e-commerce with cutting-edge MERN technology.
+            Founded in <span className="font-bold text-blue-600">{aboutData.founded}</span>, we deliver exceptional shopping experiences built for today's customers.
           </p>
         </div>
       </section>
@@ -123,9 +120,6 @@ export default function Aboutus() {
                   alt={member.name}
                   className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl group-hover:scale-110 transition-transform duration-300 border-4 border-white"
                 />
-                <div className="absolute -bottom-2 -right-4 w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                  {index + 1}
-                </div>
               </div>
               <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
                 {member.name}
@@ -138,26 +132,28 @@ export default function Aboutus() {
       </section>
 
       {/* CTA Section */}
+      
       <section className="max-w-4xl mx-auto text-center mb-24">
-        <div className="bg-linear-to-r from-blue-600 to-purple-700 text-white p-16 rounded-3xl shadow-2xl">
-          <h2 className="text-4xl md:text-5xl font-black mb-6">Ready to experience Made4UU?</h2>
-          <p className="text-xl md:text-2xl mb-12 opacity-90">Join thousands of satisfied customers today!</p>
-          <div className="space-x-4">
+        <div className="bg-linear-to-r from-blue-600 to-purple-700 text-white p-12 sm:p-16 rounded-3xl shadow-2xl">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6">Ready to experience Made4UU?</h2>
+          <p className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 opacity-90">Join thousands of satisfied customers today!</p>
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-xs sm:max-w-none mx-auto">
             <a 
               href="/products" 
-              className="inline-block bg-white text-blue-600 px-12 py-5 rounded-2xl font-bold text-xl hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              className="block w-full sm:w-auto bg-white text-blue-600 px-6 sm:px-12 py-3 sm:py-5 text-base sm:text-xl font-bold rounded-2xl hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-center"
             >
               Shop Now
             </a>
             <a 
               href="/contact" 
-              className="inline-block border-2 border-white text-white px-12 py-5 rounded-2xl font-bold text-xl hover:bg-white hover:text-blue-600 transition-all duration-300"
+              className="block w-full sm:w-auto border-2 border-white text-white px-6 sm:px-12 py-3 sm:py-5 text-base sm:text-xl font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300 text-center"
             >
               Contact Us
             </a>
           </div>
         </div>
       </section>
+
     </div>
   );
 }
