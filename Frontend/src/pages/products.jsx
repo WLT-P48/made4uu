@@ -15,17 +15,24 @@ const Products = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalProducts, setTotalProducts] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const ITEMS_PER_PAGE = 16;
 
   useEffect(() => {
-    fetchProducts();
+    fetchProducts(1);
     fetchCategories();
   }, []);
 
   useEffect(() => {
     if (selectedCategory === "All") {
-      fetchProducts();
+      fetchProducts(1);
     } else {
-      fetchProductsByCategory(selectedCategory);
+      fetchProductsByCategory(selectedCategory, 1);
     }
   }, [selectedCategory]);
 
@@ -45,14 +52,30 @@ const Products = () => {
     };
   };
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page = 1) => {
     try {
-      setLoading(true);
-      const result = await productService.getAll();
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
+      const result = await productService.getAll({ page, limit: ITEMS_PER_PAGE });
       if (result.success) {
-        // Backend returns { total, page, limit, products } - extract products array
         const transformedProducts = (result.data.products || []).map(transformProduct);
-        setProducts(transformedProducts);
+        const total = result.data.total || 0;
+        const newProductsLength = transformedProducts.length;
+        
+        if (page === 1) {
+          setProducts(transformedProducts);
+        } else {
+          setProducts(prev => [...prev, ...transformedProducts]);
+        }
+        
+        setTotalProducts(total);
+        setCurrentPage(page);
+        // Check if there are more products to load
+        setHasMore((page * ITEMS_PER_PAGE) < total);
       } else {
         setError(result.error);
       }
@@ -60,17 +83,38 @@ const Products = () => {
       setError("Failed to fetch products");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
-  const fetchProductsByCategory = async (categoryId) => {
+  const loadMoreProducts = () => {
+    if (hasMore && !loadingMore) {
+      fetchProducts(currentPage + 1);
+    }
+  };
+
+  const fetchProductsByCategory = async (categoryId, page = 1) => {
     try {
-      setLoading(true);
-      const result = await productService.getByCategory(categoryId);
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
+      const result = await productService.getByCategory(categoryId, { page, limit: ITEMS_PER_PAGE });
       if (result.success) {
-        // Backend returns array directly
-        const transformedProducts = (result.data || []).map(transformProduct);
-        setProducts(transformedProducts);
+        // Backend returns array directly when category is used
+        const data = Array.isArray(result.data) ? result.data : (result.data.products || []);
+        const transformedProducts = data.map(transformProduct);
+        
+        if (page === 1) {
+          setProducts(transformedProducts);
+        } else {
+          setProducts(prev => [...prev, ...transformedProducts]);
+        }
+        
+        // For category, we assume all products are loaded at once (no total count)
+        setHasMore(false);
       } else {
         setError(result.error);
       }
@@ -78,6 +122,7 @@ const Products = () => {
       setError("Failed to fetch products");
     } finally {
       setLoading(false);
+      setLoadingMore(false);
     }
   };
 
@@ -190,22 +235,51 @@ const Products = () => {
         ))}
       </div>
 
-{/* PRODUCT GRID */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
-        {filteredProducts.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            likedProducts={likedProducts}
-            toggleLike={toggleLike}
-          />
-        ))}
-      </div>
-
-      {filteredProducts.length === 0 && (
-        <div className="text-center text-gray-500 text-lg mt-16">
-          😔 No products found
+      {/* PRODUCT GRID */}
+      {loading ? (
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
+          {[...Array(16)].map((_, index) => (
+            <div key={index} className="bg-white rounded-2xl p-4 animate-pulse">
+              <div className="aspect-square bg-gray-200 rounded-xl mb-4"></div>
+              <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            </div>
+          ))}
         </div>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-8 lg:gap-10">
+            {filteredProducts.map((product) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+              />
+            ))}
+          </div>
+
+          {/* SHOW MORE BUTTON */}
+          {hasMore && filteredProducts.length > 0 && (
+            <div className="flex justify-center mt-10">
+              <button
+                onClick={loadMoreProducts}
+                disabled={loadingMore}
+                className={`px-8 py-3 rounded-full text-sm font-medium transition duration-300 ${
+                  loadingMore
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-black text-white hover:bg-gray-800 shadow-lg"
+                }`}
+              >
+                {loadingMore ? "Loading..." : "Show More"}
+              </button>
+            </div>
+          )}
+
+          {filteredProducts.length === 0 && !loading && (
+            <div className="text-center text-gray-500 text-lg mt-16">
+              😔 No products found
+            </div>
+          )}
+        </>
       )}
     </div>
   );

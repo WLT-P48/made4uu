@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import adminService from "../../services/admin.service";
 import { Search, ChevronDown, Edit3, X, Trash2 } from "lucide-react";
-
+ 
 const ROLE_OPTIONS = [
   { value: "Customer", label: "Customer" },
   { value: "Admin", label: "Admin" },
 ];
+
+const ITEMS_PER_PAGE = 10;
 
 const AdminUsers = () => {
   const [users, setUsers] = useState([]);
@@ -19,6 +21,7 @@ const AdminUsers = () => {
   const [newRole, setNewRole] = useState("");
   const [updating, setUpdating] = useState(false);
   const [deleting, setDeleting] = useState(null);
+  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     fetchUsers();
@@ -27,6 +30,19 @@ const AdminUsers = () => {
   useEffect(() => {
     filterUsers();
   }, [users, searchTerm, roleFilter]);
+
+  // Reset displayed count when filters or search change
+  useEffect(() => {
+    setDisplayedCount(ITEMS_PER_PAGE);
+  }, [searchTerm, roleFilter]);
+
+  const handleShowMore = () => {
+    setDisplayedCount(prev => prev + ITEMS_PER_PAGE);
+  };
+
+  // Get paginated users
+  const displayedUsers = filteredUsers.slice(0, displayedCount);
+  const hasMoreUsers = displayedCount < filteredUsers.length;
 
   const fetchUsers = async () => {
     try {
@@ -218,14 +234,14 @@ const AdminUsers = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredUsers.length === 0 ? (
+              {displayedUsers.length === 0 ? (
                 <tr>
                   <td colSpan={5} className="px-6 py-12 text-center text-gray-500">
                     No users found
                   </td>
                 </tr>
               ) : (
-                filteredUsers.map((user) => (
+                displayedUsers.map((user) => (
                   <motion.tr
                     key={user._id}
                     initial={{ opacity: 0 }}
@@ -322,6 +338,18 @@ const AdminUsers = () => {
           </table>
         </div>
       </div>
+
+      {/* Show More Button */}
+      {hasMoreUsers && (
+        <div className="flex justify-center py-4 border-t border-gray-200">
+          <button
+            onClick={handleShowMore}
+            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            Show More ({filteredUsers.length - displayedCount} remaining)
+          </button>
+        </div>
+      )}
     </div>
   );
 };

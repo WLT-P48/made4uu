@@ -1,16 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "../CartContext";
+import { useWishlist } from "../WishlistContext";
 import { HeartIcon as SolidHeart } from "@heroicons/react/24/solid";
 import { HeartIcon as OutlineHeart } from "@heroicons/react/24/outline";
 
-const ProductCard = ({ product, likedProducts, toggleLike }) => {
+const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist, wishlistLoading } = useWishlist();
   const [buttonState, setButtonState] = useState("idle"); // idle, loading, success
+  const [isLiked, setIsLiked] = useState(false);
 
   // ✅ Safe ID handling (fix)
   const productId = product.id || product._id;
+  
+  // Update isLiked when wishlist changes - fixes stale closure issue
+  useEffect(() => {
+    setIsLiked(isInWishlist(productId));
+  }, [productId, isInWishlist]);
 
   const discount =
     product.oldPrice > product.price
@@ -25,7 +33,14 @@ const ProductCard = ({ product, likedProducts, toggleLike }) => {
 
   const handleLikeClick = (e) => {
     e.stopPropagation();
-    toggleLike(productId);
+    // Use wishlist context for toggle
+    toggleWishlist({
+      id: productId,
+      name: product.name || product.title,
+      price: product.price,
+      oldPrice: product.oldPrice,
+      img: product.img || product.images?.[0]?.url
+    });
   };
 
   const handleAddToCart = async (e) => {
@@ -90,7 +105,7 @@ const ProductCard = ({ product, likedProducts, toggleLike }) => {
           onClick={handleLikeClick}
           className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"
         >
-          {likedProducts.includes(productId) ? (
+          {isLiked ? (
             <SolidHeart className="h-5 w-5 text-red-500" />
           ) : (
             <OutlineHeart className="h-5 w-5 text-gray-600 hover:text-red-500 transition-colors" />

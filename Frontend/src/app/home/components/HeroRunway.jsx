@@ -2,9 +2,28 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 
+// Custom hook to detect mobile/desktop
+function useIsMobile() {
+  const [isMobile, setIsMobile] = useState(
+    typeof window !== 'undefined' ? window.innerWidth < 768 : true
+  )
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768)
+    }
+    
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
+
+  return isMobile
+}
+
 export default function HeroRunway({ products, loading }) {
   const [index, setIndex] = useState(0)
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
 
   // Sort products by discount (highest first), then use all products
   const heroProducts = [...products].sort((a, b) => {
@@ -25,6 +44,19 @@ export default function HeroRunway({ products, loading }) {
 
   const handleProductClick = (productId) => {
     navigate(`/product/${productId}`)
+  }
+
+  // Define consistent dimensions based on screen size and position (3:4 ratio)
+  const getDimensions = (position) => {
+    if (position === "center") {
+      return isMobile 
+        ? { width: "200px", height: "267px" }  // 3:4 ratio mobile center
+        : { width: "280px", height: "373px" }  // 3:4 ratio desktop center
+    } else {
+      return isMobile 
+        ? { width: "150px", height: "200px" }  // 3:4 ratio mobile side
+        : { width: "200px", height: "267px" }  // 3:4 ratio desktop side
+    }
   }
 
   if (loading || heroProducts.length < 3) {
@@ -58,19 +90,25 @@ export default function HeroRunway({ products, loading }) {
             ? Math.round(((product.oldPrice - product.price) / product.oldPrice) * 100)
             : 0
 
+          const dimensions = getDimensions(position)
+
           return (
             <motion.div
               key={product.id}
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{
-                x: position === "center" ? 0 : position === "left" ? -120 : 120,
-                scale: position === "center" ? 1 : 0.75,
+                x: position === "center" ? 0 : position === "left" ? -140 : 140,
+                scale: position === "center" ? 1 : 0.7,
                 opacity: position === "center" ? 1 : 0.5,
                 rotate: position === "center" ? 0 : position === "left" ? -6 : 6,
                 zIndex: position === "center" ? 20 : 10,
               }}
               transition={{ duration: 0.8, type: "spring" }}
-              className="absolute rounded-2xl md:rounded-3xl shadow-2xl object-cover h-[220px] md:h-[400px] w-[160px] md:w-auto cursor-pointer overflow-hidden"
+              className="absolute rounded-2xl md:rounded-3xl shadow-2xl cursor-pointer overflow-hidden"
+              style={{
+                width: dimensions.width,
+                height: dimensions.height,
+              }}
               onClick={() => handleProductClick(product.id)}
             >
               <img

@@ -18,6 +18,8 @@ const PAYMENT_STATUS_OPTIONS = [
   { value: "CASH_ON_DELIVERY", label: "Cash on Delivery" },
 ];
 
+const ITEMS_PER_PAGE = 10;
+
 const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
   const [filteredOrders, setFilteredOrders] = useState([]);
@@ -30,6 +32,7 @@ const AdminOrders = () => {
   const [editingStatus, setEditingStatus] = useState(null);
   const [newStatus, setNewStatus] = useState("");
   const [updating, setUpdating] = useState(false);
+  const [displayedCount, setDisplayedCount] = useState(ITEMS_PER_PAGE);
 
   useEffect(() => {
     fetchOrders();
@@ -38,6 +41,19 @@ const AdminOrders = () => {
   useEffect(() => {
     filterOrders();
   }, [orders, searchTerm, statusFilter, paymentStatusFilter]);
+
+  // Reset displayed count when filters or search change
+  useEffect(() => {
+    setDisplayedCount(ITEMS_PER_PAGE);
+  }, [searchTerm, statusFilter, paymentStatusFilter]);
+
+  const handleShowMore = () => {
+    setDisplayedCount(prev => prev + ITEMS_PER_PAGE);
+  };
+
+  // Get paginated orders
+  const displayedOrders = filteredOrders.slice(0, displayedCount);
+  const hasMoreOrders = displayedCount < filteredOrders.length;
 
   const fetchOrders = async () => {
     try {
@@ -508,7 +524,7 @@ const AdminOrders = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredOrders.length === 0 ? (
+              {displayedOrders.length === 0 ? (
                 <tr>
                   <td
                     colSpan={8}
@@ -518,7 +534,7 @@ const AdminOrders = () => {
                   </td>
                 </tr>
               ) : (
-                filteredOrders.map((order) => (
+                displayedOrders.map((order) => (
                   <motion.tr
                     key={order._id}
                     initial={{ opacity: 0 }}
@@ -806,12 +822,12 @@ const AdminOrders = () => {
 
       {/* Mobile Card View */}
       <div className="md:hidden space-y-4">
-        {filteredOrders.length === 0 ? (
+        {displayedOrders.length === 0 ? (
           <div className="bg-white rounded-2xl p-8 text-center">
             <p className="text-gray-500">No orders found</p>
           </div>
         ) : (
-          filteredOrders.map((order) => (
+          displayedOrders.map((order) => (
             <MobileOrderCard key={order._id} order={order} />
           ))
         )}
@@ -819,7 +835,7 @@ const AdminOrders = () => {
 
       {/* Tablet View - Simplified Table */}
       <div className="hidden md:block lg:hidden">
-        {filteredOrders.length > 0 && (
+        {displayedOrders.length > 0 && (
           <div className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -846,7 +862,7 @@ const AdminOrders = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-100">
-                  {filteredOrders.map((order) => (
+                  {displayedOrders.map((order) => (
                     <tr key={order._id} className="hover:bg-gray-50">
                       <td className="px-4 py-3 text-sm font-medium text-gray-900">
                         {order.orderNumber ||
@@ -896,6 +912,18 @@ const AdminOrders = () => {
           </div>
         )}
       </div>
+
+      {/* Show More Button */}
+      {hasMoreOrders && (
+        <div className="flex justify-center py-4 border-t border-gray-200">
+          <button
+            onClick={handleShowMore}
+            className="px-6 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 transition-colors"
+          >
+            Show More ({filteredOrders.length - displayedCount} remaining)
+          </button>
+        </div>
+      )}
     </div>
   );
 };

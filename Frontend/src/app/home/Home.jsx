@@ -34,17 +34,8 @@ const sortByDiscount = (products) => {
 
 // ── Main Home Component ───────────────────────────────────
 export default function Home() {
-  const [likedProducts, setLikedProducts] = useState([])
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
-
-  const toggleLike = (id) => {
-    if (likedProducts.includes(id)) {
-      setLikedProducts(likedProducts.filter(item => item !== id))
-    } else {
-      setLikedProducts([...likedProducts, id])
-    }
-  }
 
   // Fetch products from backend
   useEffect(() => {
@@ -80,8 +71,6 @@ export default function Home() {
       <FeaturedProducts 
         products={products} 
         loading={loading}
-        likedProducts={likedProducts}
-        toggleLike={toggleLike}
       />
 
       {/* Stats Counter Section */}

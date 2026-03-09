@@ -1,7 +1,7 @@
 import ProductCard from '../../../components/product/ProductCard'
 import useReveal from '../hooks/useReveal'
 
-export default function FeaturedProducts({ products, loading, likedProducts, toggleLike }) {
+export default function FeaturedProducts({ products, loading }) {
   useReveal()
 
   return (
@@ -19,11 +19,7 @@ export default function FeaturedProducts({ products, loading, likedProducts, tog
           ) : (
             products.slice(0, 4).map((product, i) => (
               <div key={product.id} style={{ transitionDelay: `${(i % 3) * 100}ms` }}>
-                <ProductCard
-                  product={product}
-                  likedProducts={likedProducts}
-                  toggleLike={toggleLike}
-                />
+                <ProductCard product={product} />
               </div>
             ))
           )}

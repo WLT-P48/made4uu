@@ -1,6 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { useCart } from "../components/CartContext";
+import { useWishlist } from "../components/WishlistContext";
 import productService from "../services/product.service";
 import { HeartIcon as SolidHeart } from "@heroicons/react/24/solid";
 import { HeartIcon as OutlineHeart } from "@heroicons/react/24/outline";
@@ -10,15 +11,23 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { isInWishlist, toggleWishlist } = useWishlist();
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [suggestedProducts, setSuggestedProducts] = useState([]);
+  const [isLiked, setIsLiked] = useState(false);
+  
+  // Update isLiked when wishlist changes - fixes stale closure issue
+  useEffect(() => {
+    if (product && product.id) {
+      setIsLiked(isInWishlist(product.id));
+    }
+  }, [product, isInWishlist]);
   
   // Touch/swipe support for image gallery
   const touchStartX = useRef(0);
@@ -181,10 +190,10 @@ const fetchProduct = async () => {
               
               {/* Like Button */}
               <div
-                onClick={() => setLiked(!liked)}
+                onClick={() => toggleWishlist(product)}
                 className="absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/90 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"
               >
-                {liked ? (
+                {isLiked ? (
                   <SolidHeart className="h-5 w-5 sm:h-6 sm:w-6 text-red-500" />
                 ) : (
                   <OutlineHeart className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600 hover:text-red-500 transition-colors" />

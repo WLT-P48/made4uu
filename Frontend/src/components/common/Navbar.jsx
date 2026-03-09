@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { useCart } from "../CartContext";
+import { useWishlist } from "../WishlistContext";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const currentPath = window.location.pathname;
   const { cartCount } = useCart();
+  const { wishlistCount } = useWishlist();
 
   const navLinks = [
     {
@@ -42,6 +44,15 @@ export default function Navbar() {
   ];
 
   const iconOnlyLinks = [
+    {
+      name: "Wishlist",
+      href: "/wishlist",
+      icon: (
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+        </svg>
+      ),
+    },
     {
       name: "Cart",
       href: "/cart",
@@ -130,6 +141,17 @@ export default function Navbar() {
                     {cartCount > 0 && (
                       <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
                         {cartCount > 9 ? "9+" : cartCount}
+                      </span>
+                    )}
+                  </div>
+                ) : link.name === "Wishlist" ? (
+                  <div className="relative">
+                    <svg className="w-6 h-6" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    {wishlistCount > 0 && (
+                      <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-bold w-5 h-5 flex items-center justify-center rounded-full">
+                        {wishlistCount > 9 ? "9+" : wishlistCount}
                       </span>
                     )}
                   </div>

@@ -12,6 +12,7 @@ import Contact from "../pages/Contact";
 import Products from "../pages/products";
 import ProductDetails from "../pages/ProductDetails";
 import MyOrders from "../pages/MyOrders";
+import Wishlist from "../pages/Wishlist";
 
 // ADMIN
 import AdminLayout from "../pages/adminPages/AdminLayout";
@@ -38,6 +39,7 @@ const AppRoutes = createBrowserRouter([
       { path: "contact", element: <Contact /> },
       { path: "products", element: <Products /> },
       { path: "product/:id", element: <ProductDetails /> },
+      { path: "wishlist", element: <Wishlist /> },
 
       // 🔥 ADMIN NESTED INSIDE LAYOUT
       {

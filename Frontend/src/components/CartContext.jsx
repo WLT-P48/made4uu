@@ -8,6 +8,8 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Track loading state for cart operations
+  const [cartLoading, setCartLoading] = useState(false);
 
   /* =============================
      FETCH USER
@@ -72,7 +74,7 @@ export const CartProvider = ({ children }) => {
         // For guest cart, check if product exists and merge quantity
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const existingItemIndex = guestCart.findIndex(
-          (item) => item.productId === product.id
+          (item) => String(item.productId) === String(product.id)
         );
 
         if (existingItemIndex > -1) {
@@ -114,7 +116,7 @@ export const CartProvider = ({ children }) => {
       if (!userId) {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const filtered = guestCart.filter(
-          (item) => item.productId !== productId
+          (item) => String(item.productId) !== String(productId)
         );
         localStorage.setItem("guestCart", JSON.stringify(filtered));
         setCart(filtered);
@@ -137,14 +139,20 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = useCallback(
     async (productId, quantity) => {
       if (quantity < 1) return;
+      
+      // Prevent multiple simultaneous requests
+      if (cartLoading) return;
+      
+      setCartLoading(true);
 
       if (!userId) {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
         const updated = guestCart.map((item) =>
-          item.productId === productId ? { ...item, quantity } : item
+          String(item.productId) === String(productId) ? { ...item, quantity } : item
         );
         localStorage.setItem("guestCart", JSON.stringify(updated));
         setCart(updated);
+        setCartLoading(false);
         return;
       }
 
@@ -154,9 +162,11 @@ export const CartProvider = ({ children }) => {
         await fetchCart();
       } catch (error) {
         console.error("Error updating quantity:", error);
+      } finally {
+        setCartLoading(false);
       }
     },
-    [userId]
+    [userId, cartLoading]
   );
 
   /* =============================

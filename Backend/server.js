@@ -14,6 +14,7 @@ const addressRoutes = require("./routes/address.routes");
 const cartRoutes = require("./routes/cart.routes");
 const activityLogRoutes = require("./routes/activityLog.routes");
 const adminRoutes = require("./routes/admin.routes");
+const wishlistRoutes = require("./routes/wishlist.routes");
 
 const app = express();
 
@@ -56,6 +57,7 @@ app.use("/api/addresses", addressRoutes);
 app.use("/api/cart", cartRoutes);
 app.use("/api/activity-logs", activityLogRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/wishlist", wishlistRoutes);
 
 /* ===========================
    ERROR HANDLER
