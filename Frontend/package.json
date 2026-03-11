@@ -13,7 +13,8 @@
     "@heroicons/react": "^2.2.0",
     "@react-oauth/google": "^0.13.4",
     "axios": "^1.13.5",
-    "framer-motion": "^12.34.2",
+    "framer-motion": "^12.34.5",
+    "lucide-react": "^0.576.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
     "react-router-dom": "^7.13.0"
