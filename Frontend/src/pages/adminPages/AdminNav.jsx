@@ -26,7 +26,7 @@ export default function AdminNav() {
   ];
 
   const productSubNav = [
-    { label: "View Products", path: "/admin/products", icon: <Package size={14} /> },
+{ label: "Manage Product", path: "/admin/products", icon: <Package size={14} /> },
     { label: "Create Product", path: "/admin/products/create", icon: <Plus size={14} /> },
   ];
 
