@@ -1,86 +1,108 @@
-import { motion } from 'framer-motion'
-import { FaStar } from 'react-icons/fa'
-import { IoSparkles } from 'react-icons/io5'
-import { useEffect, useState } from 'react'
-import HeroRunway from './HeroRunway'
+import { motion } from "framer-motion";
+import { FaStar } from "react-icons/fa";
+import { IoSparkles } from "react-icons/io5";
+import { useEffect, useState } from "react";
+import HeroRunway from "./HeroRunway";
+import AnimatedBrand from "../../../components/common/AnimatedBrand.jsx";
 
 export default function HeroSection({ products, loading }) {
 
   const typingLines = [
     "Make it yours. Make it iconic.",
     "Stand out. Stay personal.",
-    "Made4UU Perfect for every moment.",
+    "Perfect for every moment.",
     "A gift that remembers."
-  ]
+  ];
 
-  const [text, setText] = useState("")
-  const [index, setIndex] = useState(0)
-  const [isDeleting, setIsDeleting] = useState(false)
+  const [text, setText] = useState("");
+  const [lineIndex, setLineIndex] = useState(0);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
-    const currentLine = typingLines[index]
-    const speed = isDeleting ? 40 : 70
+    const current = typingLines[lineIndex];
+    const speed = isDeleting ? 40 : 70;
 
     const timer = setTimeout(() => {
+
       if (!isDeleting) {
-        setText(currentLine.substring(0, text.length + 1))
-        if (text === currentLine) {
-          setTimeout(() => setIsDeleting(true), 1200)
+        setText(current.slice(0, text.length + 1));
+
+        if (text === current) {
+          setTimeout(() => setIsDeleting(true), 1200);
         }
+
       } else {
-        setText(currentLine.substring(0, text.length - 1))
+        setText(current.slice(0, text.length - 1));
+
         if (text === "") {
-          setIsDeleting(false)
-          setIndex((prev) => (prev + 1) % typingLines.length)
+          setIsDeleting(false);
+          setLineIndex((prev) => (prev + 1) % typingLines.length);
         }
       }
-    }, speed)
 
-    return () => clearTimeout(timer)
-  }, [text, isDeleting, index])
+    }, speed);
+
+    return () => clearTimeout(timer);
+
+  }, [text, isDeleting, lineIndex]);
 
   return (
-    <section className="min-h-[60vh] md:min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-blue-50 via-indigo-50 to-white px-4 relative overflow-hidden py-8 md:py-0">
+    <section className="relative min-h-[70vh] md:min-h-screen flex flex-col items-center justify-center px-6 py-12 overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-white">
 
       {/* Background Glow */}
-      <div className="absolute w-[250px] h-[250px] md:w-[500px] md:h-[500px] bg-blue-200 rounded-full opacity-20 blur-3xl top-0 right-0 -translate-y-1/2 translate-x-1/3" />
-      <div className="absolute w-[200px] h-[200px] md:w-[400px] md:h-[400px] bg-indigo-200 rounded-full opacity-20 blur-3xl bottom-0 left-0 translate-y-1/2 -translate-x-1/3" />
+      <div className="absolute w-[420px] h-[420px] bg-indigo-300/20 blur-3xl rounded-full -top-32 -right-32" />
+      <div className="absolute w-[420px] h-[420px] bg-blue-300/20 blur-3xl rounded-full -bottom-32 -left-32" />
 
-      {/* Main Headline */}
-      <motion.h1
-        initial={{ opacity: 0, y: 40 }}
+      {/* Headline */}
+      <motion.div
+        initial={{ opacity: 0, y: -15 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="text-2xl md:text-4xl lg:text-5xl font-semibold text-gray-900 text-center mb-4 md:mb-3 z-10"
+        transition={{ duration: 0.6 }}
+        className="z-10 flex flex-wrap items-center justify-center gap-2 text-center mb-4"
       >
-        Made4UU - Where Every Choice Feels Right
-      </motion.h1>
+        <AnimatedBrand />
+        <span className="text-gray-700 font-semibold text-lg md:text-xl">
+          – Where Every Choice Feels Right
+        </span>
+      </motion.div>
 
       {/* Typing Subtitle */}
       <motion.p
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.6 }}
-        className="text-sm md:text-lg text-indigo-600 font-medium h-8 md:h-10 text-center mb-6 md:mb-10 z-10"
+        className="z-10 text-indigo-600 font-medium text-sm md:text-lg h-8 md:h-10 text-center mb-8"
       >
         {text}
-        <span className="animate-pulse">|</span>
+        <span className="animate-pulse ml-1">|</span>
       </motion.p>
 
-      {/* Sub Info */}
-      <div className="flex flex-wrap justify-center items-center gap-2 md:gap-4 text-xs md:text-sm text-gray-500 mb-6 md:mb-16 z-10">
+      {/* Social Proof */}
+      <motion.div
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.8 }}
+        className="z-10 flex flex-wrap justify-center items-center gap-4 text-sm text-gray-600 mb-12"
+      >
         <span className="flex items-center gap-1 text-amber-400">
-          <FaStar /> <FaStar /> <FaStar /> <FaStar /> <FaStar />
+          <FaStar /><FaStar /><FaStar /><FaStar /><FaStar />
         </span>
-        <span>500+ Happy Customers</span>
+
+        <span className="font-medium">
+          500+ Happy Customers
+        </span>
+
         <span className="flex items-center gap-1">
-          <IoSparkles className="text-indigo-500" /> 100% Customizable
+          <IoSparkles className="text-indigo-500" />
+          100% Customizable
         </span>
-      </div>
+      </motion.div>
 
       {/* Runway Animation */}
-      <HeroRunway products={products} loading={loading} />
+      <div className="w-full max-w-6xl z-10">
+        <HeroRunway products={products} loading={loading} />
+      </div>
 
     </section>
-  )
+  );
 }

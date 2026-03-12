@@ -1,19 +1,20 @@
 import React, { useState, useEffect } from "react";
+import { useGlobalLoading } from "./GlobalLoadingContext";
 
+// Reuse the loader animation from app/Loading.jsx
 const Loader = () => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    // Inject keyframes once
-    if (!document.getElementById("loader-keyframes")) {
+    // Add keyframes once
+    if (!document.getElementById("global-loader-keyframes")) {
       const style = document.createElement("style");
-      style.id = "loader-keyframes";
+      style.id = "global-loader-keyframes";
       style.textContent = `
         @keyframes squareSlide {
           0% { stroke-dashoffset: 0; }
           100% { stroke-dashoffset: 256; }
         }
-
         @keyframes dotFollow {
           0% { cx: 8; cy: 40; }
           12.5% { cx: 8; cy: 72; }
@@ -25,7 +26,6 @@ const Loader = () => {
           87.5% { cx: 8; cy: 8; }
           100% { cx: 8; cy: 40; }
         }
-
         @keyframes dotFollowMobile {
           0% { cx: 8; cy: 50; }
           12.5% { cx: 8; cy: 92; }
@@ -62,10 +62,10 @@ const Loader = () => {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "rgba(255,255,255,0.25)", // 25% transparent
-    backdropFilter: "blur(8px)", // glass effect
+    background: "rgba(255,255,255,0.25)",
+    backdropFilter: "blur(8px)",
     WebkitBackdropFilter: "blur(8px)",
-    zIndex: 9999,
+    zIndex: 99999,
   };
 
   const sliderStyle = {
@@ -139,7 +139,12 @@ const Loader = () => {
                 pathLength="256"
                 style={squareStyle}
               />
-              <circle r="6" cx="8" cy="50" style={mobileDotStyle} />
+              <circle
+                r="6"
+                cx="8"
+                cy="50"
+                style={mobileDotStyle}
+              />
               <text
                 x="100"
                 y="52"
@@ -182,4 +187,16 @@ const Loader = () => {
   );
 };
 
-export default Loader;
+// Global loading overlay component
+const GlobalLoading = () => {
+  const { loading } = useGlobalLoading();
+
+  if (!loading) {
+    return null;
+  }
+
+  return <Loader />;
+};
+
+export default GlobalLoading;
+

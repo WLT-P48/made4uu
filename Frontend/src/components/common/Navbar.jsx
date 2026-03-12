@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useCart } from "../CartContext";
 import { useWishlist } from "../WishlistContext";
+import AnimatedBrand from "./AnimatedBrand";
 
 export default function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -83,11 +84,11 @@ export default function Navbar() {
         <div className="flex h-16 items-center justify-between">
           
           {/* Logo */}
-          <a
-            href="/"
-            className="text-2xl font-extrabold text-indigo-600 transition hover:scale-105"
+          <a 
+            href="/" 
+className="flex items-center text-3xl font-extrabold transition-all duration-300 hover:scale-105"
           >
-            Made4UU
+            <AnimatedBrand />
           </a>
 
           {/* Desktop Menu */}
