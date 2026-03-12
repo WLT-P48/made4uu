@@ -21,8 +21,9 @@ import AdminDashboard from "../pages/adminPages/AdminDashboard";
 import AdminOrders from "../pages/adminPages/AdminOrders";
 import AdminUsers from "../pages/adminPages/AdminUsers";
 import CreateProduct from "../pages/adminPages/CreateProduct";
-import UpdateProduct from "../pages/adminPages/UpdateProduct";
-import DeleteProduct from "../pages/adminPages/DeleteProduct";
+import ManageProduct from "../pages/adminPages/ManageProduct";
+// import UpdateProduct from "../pages/adminPages/UpdateProduct";
+// import DeleteProduct from "../pages/adminPages/DeleteProduct";
 
 // Reusable CSS spinner loader
 const PageLoader = () => (
@@ -113,10 +114,10 @@ const AppRoutes = createBrowserRouter([
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "orders", element: <AdminOrders /> },
           { path: "users", element: <AdminUsers /> },
-          { path: "products", element: <AdminDashboard /> },
+          { path: "products", element: <ManageProduct /> },
           { path: "products/create", element: <CreateProduct /> },
-          { path: "products/update", element: <UpdateProduct /> },
-          { path: "products/delete", element: <DeleteProduct /> },
+          // { path: "products/update", element: <UpdateProduct /> },
+          // { path: "products/delete", element: <DeleteProduct /> },
         ],
       },
     ],
