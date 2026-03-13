@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import productService from "../../services/product.service";
 import ProductForm from "../../components/admin/ProductForm";
-import { Trash2, Edit3, Eye, Search, Plus, ChevronDown } from "lucide-react";
+import { Trash2, Edit3, Eye, Search, Plus, ChevronDown, X } from "lucide-react";
 
 export default function ManageProduct() {
   const navigate = useNavigate();
@@ -21,9 +21,6 @@ export default function ManageProduct() {
   const [isSearching, setIsSearching] = useState(false);
   const [searchResults, setSearchResults] = useState([]);
   const pageSize = 10;
-
-  // Debounce search
-  const searchTimeoutRef = useRef(null);
 
   const fetchProducts = async (page = currentPage, isSearch = false, reset = false) => {
     setLoading(page === 1);
@@ -63,27 +60,31 @@ export default function ManageProduct() {
     }
   };
 
-  const handleSearch = useCallback((term) => {
-    setSearchTerm(term);
-    setIsSearching(true);
+  const onClickSearch = useCallback(async () => {
     setCurrentPage(1);
-    if (searchTimeoutRef.current) {
-      clearTimeout(searchTimeoutRef.current);
+    setIsSearching(true);
+    
+    if (searchTerm.trim()) {
+      await fetchProducts(1, true, true);
+    } else {
+      await fetchProducts(1, false, true);
     }
-    searchTimeoutRef.current = setTimeout(async () => {
-      if (term.trim()) {
-        await fetchProducts(1, true, true);
-      } else {
-        await fetchProducts(1, false, true);
-      }
-      setIsSearching(false);
-    }, 500);
-  }, []);
+    
+    setIsSearching(false);
+  }, [searchTerm]);
+
+  const clearSearch = () => {
+    setSearchTerm('');
+    setSearchResults([]);
+    setIsSearching(false);
+    setCurrentPage(1);
+    fetchProducts(1, false, true);
+  };
 
   const loadMore = async () => {
     const nextPage = currentPage + 1;
     setCurrentPage(nextPage);
-    await fetchProducts(nextPage, !!searchTerm, false);
+    await fetchProducts(nextPage, !!searchTerm.trim(), false);
   };
 
   const handleDelete = async (id) => {
@@ -108,7 +109,7 @@ export default function ManageProduct() {
     setShowEditModal(false);
     setEditingProduct(null);
     // Refresh current page
-    fetchProducts(currentPage, !!searchTerm, true);
+    fetchProducts(currentPage, !!searchTerm.trim(), true);
   };
 
   const displayProducts = isSearching ? searchResults : products;
@@ -147,19 +148,42 @@ export default function ManageProduct() {
 
       {/* Search Bar */}
       <div className="bg-white rounded-lg shadow-sm p-4">
-        <div className="flex items-center gap-3">
-          <Search size={20} className="text-gray-400" />
-          <input
-            type="text"
-            placeholder="Search products by name or category..."
-            value={searchTerm}
-            onChange={(e) => handleSearch(e.target.value)}
-            className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
-            disabled={loading}
-          />
-          {isSearching && (
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-black"></div>
-          )}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
+          <Search size={20} className="text-gray-400 mt-1 sm:mt-0" />
+          <div className="flex flex-1 flex-col sm:flex-row w-full gap-2">
+            <div className="flex flex-1 relative">
+              <input
+                type="text"
+                placeholder="Search products by title only..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent"
+                disabled={loading}
+              />
+              {searchTerm && (
+                <button
+                  onClick={clearSearch}
+                  className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1 rounded-full hover:bg-gray-100"
+                  title="Clear search"
+                >
+                  <X size={16} />
+                </button>
+              )}
+            </div>
+            <button
+              onClick={onClickSearch}
+              disabled={loading}
+              className="bg-black text-white px-6 py-2 rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 whitespace-nowrap w-full sm:w-auto"
+              title="Search"
+            >
+              <Search size={16} />
+              {isSearching ? (
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+              ) : (
+                'Search'
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -175,19 +199,51 @@ export default function ManageProduct() {
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Image</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Image</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Category</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Price</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Stock</th>
+                    <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Status</th>
                     <th className="px-6 py-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {displayProducts.map((product) => (
-                    <tr key={product._id} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap">
+                    <tr key={product._id} className="hover:bg-gray-50 md:flex-row flex-col">
+                      <td colSpan="7" className="md:hidden px-6 py-4">
+                        <div className="flex flex-col space-y-3 p-4 border-t border-gray-100">
+                          <div className="text-sm font-medium text-gray-900">{product.title}</div>
+                          <div className="flex items-center gap-1 pt-2">
+                            <button
+                              onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                              className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 flex-shrink-0"
+                              title="View Product"
+                            >
+                              <Eye size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleEdit(product)}
+                              className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 flex-shrink-0"
+                              title="Edit"
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(product._id)}
+                              disabled={deletingId === product._id}
+                              className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50 flex-shrink-0"
+                              title="Delete"
+                            >
+                              <Trash2 size={16} />
+                              {deletingId === product._id && (
+                                <span className="ml-1 animate-spin text-xs">...</span>
+                              )}
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <img
                           src={product.images?.[0]?.url || '/placeholder.jpg'}
                           alt={product.title}
@@ -197,14 +253,14 @@ export default function ManageProduct() {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="text-sm font-medium text-gray-900">{product.title}</div>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{product.categoryId?.name || 'N/A'}</td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden sm:table-cell">{product.categoryId?.name || 'N/A'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <span className="text-sm font-semibold text-gray-900">₹{product.price}</span>
                         {product.discountPrice && (
                           <span className="text-sm text-gray-400 line-through ml-1">₹{product.discountPrice}</span>
                         )}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           product.stock > 10 ? 'bg-green-100 text-green-800' : 
                           product.stock > 0 ? 'bg-yellow-100 text-yellow-800' : 
@@ -213,39 +269,70 @@ export default function ManageProduct() {
                           {product.stock}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap">
+                      <td className="px-6 py-4 whitespace-nowrap hidden sm:table-cell">
                         <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           product.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
                         }`}>
                           {product.isActive ? 'Active' : 'Inactive'}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-                        <button
-                          onClick={() => window.open(`/product/${product._id}`, '_blank')}
-                          className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50"
-                          title="View Product"
-                        >
-                          <Eye size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(product)}
-                          className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50"
-                          title="Edit"
-                        >
-                          <Edit3 size={16} />
-                        </button>
-                        <button
-                          onClick={() => handleDelete(product._id)}
-                          disabled={deletingId === product._id}
-                          className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50"
-                          title="Delete"
-                        >
-                          <Trash2 size={16} />
-                          {deletingId === product._id && (
-                            <span className="ml-1 animate-spin">...</span>
-                          )}
-                        </button>
+                      <td className="px-4 py-4 hidden md:hidden">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                            className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 flex-shrink-0"
+                            title="View Product"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 flex-shrink-0"
+                            title="Edit"
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product._id)}
+                            disabled={deletingId === product._id}
+                            className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50 flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 size={16} />
+                            {deletingId === product._id && (
+                              <span className="ml-1 animate-spin text-xs">...</span>
+                            )}
+                          </button>
+                        </div>
+                      </td>
+                      <td className="px-4 py-4 md:table-cell">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => window.open(`/product/${product._id}`, '_blank')}
+                            className="text-indigo-600 hover:text-indigo-900 p-1 rounded hover:bg-indigo-50 flex-shrink-0"
+                            title="View Product"
+                          >
+                            <Eye size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleEdit(product)}
+                            className="text-blue-600 hover:text-blue-900 p-1 rounded hover:bg-blue-50 flex-shrink-0"
+                            title="Edit"
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(product._id)}
+                            disabled={deletingId === product._id}
+                            className="text-red-600 hover:text-red-900 p-1 rounded hover:bg-red-50 disabled:opacity-50 flex-shrink-0"
+                            title="Delete"
+                          >
+                            <Trash2 size= {16} />
+                            {deletingId === product._id && (
+                              <span className="ml-1 animate-spin text-xs">...</span>
+                            )}
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}

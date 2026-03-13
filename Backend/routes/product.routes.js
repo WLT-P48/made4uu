@@ -4,6 +4,7 @@ const {
   getAllProducts,
   getProductById,
   getProductsByCategory,
+  searchProductsTitle,
   updateProduct,
   deleteProduct,
   updateProductStock,
@@ -22,7 +23,7 @@ const router = express.Router();
 router.get('/', getAllProducts); // Get all products (with filters & pagination)
 router.get('/category/:categoryId', getProductsByCategory); // Get products by category - MUST be before /:id
 router.get('/featured', getAllProducts); // Get featured products
-router.get('/search', getAllProducts); // Search products
+router.get('/search', searchProductsTitle); // Search products by title
 router.get('/:id/images/:imageId', getProductImageById); // Get specific image for a product - MUST be before /:id
 router.get('/:id', getProductById); // Get single product by ID - MUST be last due to catch-all
 

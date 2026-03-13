@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Loader2, Upload, X, Image as ImageIcon } from "lucide-react";
 import axios from "axios";
@@ -24,6 +24,10 @@ export default function ProductForm({
   const fileInputRef = useRef(null);
   const [selectedImages, setSelectedImages] = useState([]);
 
+  // Existing images for edit mode
+  const [existingImages, setExistingImages] = useState([]);
+  const [imagesToDelete, setImagesToDelete] = useState([]);
+
   const [formData, setFormData] = useState({
     title: initialData.title || "",
     description: initialData.description || "",
@@ -37,6 +41,8 @@ export default function ProductForm({
     },
     isActive: initialData.isActive !== undefined ? initialData.isActive : true,
   });
+
+  const MAX_IMAGES = 5;
 
   useEffect(() => {
     setFormData({
@@ -52,10 +58,15 @@ export default function ProductForm({
       },
       isActive: initialData.isActive !== undefined ? initialData.isActive : true,
     });
-    // Reset images for edit mode if needed
+    
+    // Load existing images for edit mode
     if (mode === 'edit' && initialData.images) {
-      // For edit, could preload existing images, but for simplicity reset to allow re-upload
+      setExistingImages(initialData.images.slice(0, MAX_IMAGES)); // Limit display
+    } else {
+      setExistingImages([]);
     }
+    setImagesToDelete([]);
+    setSelectedImages([]);
   }, [initialData, mode]);
 
   const fetchCategories = async () => {
@@ -121,8 +132,9 @@ export default function ProductForm({
       return;
     }
 
-    if (selectedImages.length + files.length > 5) {
-      setError("Maximum 5 images allowed");
+    const currentCount = existingImages.length - imagesToDelete.length + selectedImages.length;
+    if (currentCount + files.length > MAX_IMAGES) {
+      setError(`Maximum ${MAX_IMAGES} images allowed. Current: ${currentCount}, Adding ${files.length}`);
       return;
     }
 
@@ -136,13 +148,21 @@ export default function ProductForm({
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const handleRemoveImage = (index) => {
+  const handleRemoveNewImage = (index) => {
     setSelectedImages(prev => {
       const updated = [...prev];
       URL.revokeObjectURL(updated[index].preview);
       updated.splice(index, 1);
       return updated;
     });
+  };
+
+  const handleRemoveExistingImage = (imageId) => {
+    setImagesToDelete(prev => [...prev, imageId]);
+  };
+
+  const handleUndoDelete = (imageId) => {
+    setImagesToDelete(prev => prev.filter(id => id !== imageId));
   };
 
   const handleSubmit = async (e) => {
@@ -177,6 +197,7 @@ export default function ProductForm({
         const currentProductId = productResponse.data._id || productId;
         setSuccessMessage(mode === 'create' ? "Product created successfully!" : "Product updated successfully!");
         
+        // Upload new images
         if (selectedImages.length > 0) {
           setUploadingImages(true);
           const formDataObj = new FormData();
@@ -186,12 +207,24 @@ export default function ProductForm({
 
           try {
             await productService.uploadImages(currentProductId, formDataObj);
-            setSuccessMessage(`${mode === 'create' ? 'Product created' : 'Product updated'} and images uploaded successfully!`);
           } catch (uploadErr) {
             console.error("Image upload failed:", uploadErr);
             setError("Saved product but failed to upload images. Please try again.");
           }
         }
+
+        // Delete selected images
+        if (imagesToDelete.length > 0 && mode === 'edit') {
+          for (const imageId of imagesToDelete) {
+            try {
+              await productService.deleteImage(currentProductId, imageId);
+            } catch (deleteErr) {
+              console.error("Image delete failed:", deleteErr);
+            }
+          }
+        }
+
+        setSuccessMessage(`${mode === 'create' ? 'Product created' : 'Product updated'} and images updated successfully!`);
 
         if (onSuccess) {
           onSuccess(productResponse.data);
@@ -209,6 +242,8 @@ export default function ProductForm({
       setUploadingImages(false);
     }
   };
+
+  const currentCount = existingImages.length - imagesToDelete.length + selectedImages.length;
 
   return (
     <div className={`max-w-3xl mx-auto ${className}`}>
@@ -388,7 +423,7 @@ export default function ProductForm({
                 <div className="flex items-center gap-2 text-gray-600">
                   <Upload size={20} />
                   <span className="font-medium">Images</span>
-                  <span className="text-sm text-gray-400">({selectedImages.length}/5)</span>
+                  <span className="text-sm text-gray-400">({currentCount}/5)</span>
                 </div>
                 <input
                   type="file"
@@ -403,36 +438,79 @@ export default function ProductForm({
                   htmlFor="image-upload"
                   className="cursor-pointer bg-black text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-gray-800 transition-colors w-full sm:w-auto text-center"
                 >
-                  Select Images
+                  Add New Images
                 </label>
               </div>
 
-              {selectedImages.length > 0 && (
-                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 mt-3">
-                  {selectedImages.map((img, index) => (
-                    <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
-                      <img
-                        src={img.preview}
-                        alt={`Preview ${index + 1}`}
-                        className="w-full h-full object-cover"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveImage(index)}
-                        className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <X size={14} />
-                      </button>
-                    </div>
-                  ))}
+              {/* Existing Images (Edit Mode Only) */}
+              {mode === 'edit' && existingImages.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    Current Images ({existingImages.length})
+                  </h4>
+  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 mb-4">
+                    {existingImages.map((img, index) => (
+                      <div key={img.imageId || index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
+                        <img
+                          src={img.url}
+                          alt="Current"
+                          className="w-full h-full object-cover"
+                        />
+                        {imagesToDelete.includes(img.imageId) ? (
+                          <button
+                            onClick={() => handleUndoDelete(img.imageId)}
+                            className="absolute -top-2 -right-2 bg-green-500 text-white rounded-full p-1.5 shadow-lg opacity-100 transition-all hover:scale-110"
+                          >
+                            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
+                            </svg>
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => handleRemoveExistingImage(img.imageId)}
+                            className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                          >
+                            <X size={14} />
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
-              {selectedImages.length === 0 && (
+              {/* New Selected Images */}
+              {selectedImages.length > 0 && (
+                <div>
+                  <h4 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    New Images to Add ({selectedImages.length})
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+                    {selectedImages.map((img, index) => (
+                      <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200 border-dashed">
+                        <img
+                          src={img.preview}
+                          alt={`Preview ${index + 1}`}
+                          className="w-full h-full object-cover"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveNewImage(index)}
+                          className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow-lg opacity-0 group-hover:opacity-100 transition-all hover:scale-110"
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {(selectedImages.length === 0 && existingImages.length === 0) && (
                 <div className="text-center py-6 text-gray-400">
                   <ImageIcon className="mx-auto mb-2" size={32} />
-                  <p className="text-sm">No images selected</p>
-                  <p className="text-xs mt-1">Select up to 5 images (JPEG, PNG, GIF, WebP)</p>
+                  <p className="text-sm">No images</p>
+                  <p className="text-xs mt-1">Add up to 5 images (JPEG, PNG, GIF, WebP)</p>
                 </div>
               )}
             </div>
@@ -447,7 +525,7 @@ export default function ProductForm({
             >
               {(loading || uploadingImages) && <Loader2 className="animate-spin" size={20} />}
               {loading 
-                ? `${mode}...` 
+                ? `${mode === 'create' ? 'Creating' : 'Updating'}...` 
                 : uploadingImages 
                   ? "Uploading Images..." 
                   : mode === 'create' ? 'Create Product' : 'Update Product'}
@@ -467,3 +545,4 @@ export default function ProductForm({
     </div>
   );
 }
+

@@ -379,11 +379,68 @@ const getProductImageByNumber = async (req, res) => {
   }
 };
 
+/**
+ * Search products by title only (Admin pagination support)
+ */
+const searchProductsTitle = async (req, res) => {
+  try {
+    const {
+      q,
+      page = 1,
+      limit = 10,
+      isActive
+    } = req.query;
+
+    if (!q || typeof q !== 'string') {
+      return res.status(400).json({ message: 'Search query "q" is required' });
+    }
+
+    const query = {
+      title: { $regex: escapeRegExp(q.trim()), $options: 'i' },
+      isDeleted: false
+    };
+
+    if (isActive !== undefined) {
+      query.isActive = isActive === 'true';
+    }
+
+    const products = await Product.find(query)
+      .populate('categoryId', 'name')
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * limit)
+      .limit(Number(limit));
+
+    // Sort images by imageNumber for each product
+    products.forEach(product => {
+      if (product.images && product.images.length > 0) {
+        product.images.sort((a, b) => a.imageNumber - b.imageNumber);
+      }
+    });
+
+    const total = await Product.countDocuments(query);
+
+    res.json({
+      total,
+      page: Number(page),
+      limit: Number(limit),
+      products
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Helper function for regex escape
+function escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
 module.exports = {
   createProduct,
   getAllProducts,
   getProductById,
   getProductsByCategory,
+  searchProductsTitle,
   updateProduct,
   deleteProduct,
   updateProductStock,
