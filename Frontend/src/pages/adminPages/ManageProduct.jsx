@@ -131,13 +131,7 @@ export default function ManageProduct() {
             {isSearching && ` • Searching "${searchTerm}"`}
           </p>
         </div>
-        <button
-          onClick={() => navigate("/admin/products/create")}
-          className="bg-black text-white px-6 py-2 rounded-lg font-medium hover:bg-gray-800 flex items-center gap-2 self-start sm:self-end"
-        >
-          <Plus size={20} />
-          Add New Product
-        </button>
+        
       </div>
 
       {error && (

@@ -7,27 +7,18 @@ import {
   BarChart3,
   Settings,
   Plus,
-  Pencil,
-  Trash2,
-  ChevronDown,
-  ChevronUp,
 } from "lucide-react";
 
 export default function AdminNav() {
   const navigate = useNavigate();
   const location = useLocation();
-  const [showProductsSubNav, setShowProductsSubNav] = useState(false);
-
   const buttons = [
-    { label: "Dashboard", path: "/admin", icon: <BarChart3 size={16} /> },
+    { label: "Dashboard", path: "/admin/dashboard", icon: <BarChart3 size={16} /> },
     { label: "Users", path: "/admin/users", icon: <Users size={16} /> },
     { label: "Orders", path: "/admin/orders", icon: <ShoppingCart size={16} /> },
     { label: "Settings", path: "/admin/settings", icon: <Settings size={16} /> },
-  ];
-
-  const productSubNav = [
-{ label: "Manage Product", path: "/admin/products", icon: <Package size={14} /> },
-    { label: "Create Product", path: "/admin/products/create", icon: <Plus size={14} /> },
+    { label: "Manage Products", path: "/admin/products", icon: <Package size={16} /> },
+    { label: "Create Product", path: "/admin/products/create", icon: <Plus size={16} /> },
   ];
 
   const isProductsActive = location.pathname.startsWith("/admin/products");
@@ -39,18 +30,15 @@ export default function AdminNav() {
       </div>
 
       <div className="px-6 pb-4 flex gap-3 flex-wrap">
+
+        {/* Main Navigation */}
         {buttons.map((btn) => {
-          const isDashboard = btn.path === "/admin";
-          const isActive =
-            isDashboard
-              ? location.pathname === "/admin" ||
-                location.pathname === "/admin/dashboard"
-              : location.pathname.startsWith(btn.path);
+          const isActive = location.pathname === btn.path;
 
           return (
             <button
               key={btn.label}
-              onClick={() => navigate(btn.path)}
+              onClick={() => navigate(btn.path, { replace: true })}
               className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium border-2 transition ${
                 isActive
                   ? "bg-black text-white border-black"
@@ -63,47 +51,6 @@ export default function AdminNav() {
           );
         })}
 
-        {/* Products Button with Sub-nav */}
-        <div className="relative">
-          <button
-            onClick={() => setShowProductsSubNav(!showProductsSubNav)}
-            className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium border-2 transition ${
-              isProductsActive
-                ? "bg-black text-white border-black"
-                : "bg-white text-gray-800 border-gray-300 hover:bg-blue-600 hover:text-white hover:border-blue-600"
-            }`}
-          >
-            <Package size={16} />
-            Products
-            {showProductsSubNav ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-          </button>
-
-          {/* Sub-nav dropdown */}
-          {showProductsSubNav && (
-            <div className="absolute top-full left-0 mt-2 bg-white shadow-lg rounded-lg py-2 min-w-[180px] z-50 border border-gray-200">
-              {productSubNav.map((subBtn) => {
-                const isSubActive = location.pathname === subBtn.path;
-                return (
-                  <button
-                    key={subBtn.label}
-                    onClick={() => {
-                      navigate(subBtn.path);
-                      setShowProductsSubNav(false);
-                    }}
-                    className={`w-full flex items-center gap-2 px-4 py-2 text-sm transition ${
-                      isSubActive
-                        ? "bg-black text-white"
-                        : "hover:bg-blue-50 text-gray-700"
-                    }`}
-                  >
-                    {subBtn.icon}
-                    {subBtn.label}
-                  </button>
-                );
-              })}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );

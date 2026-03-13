@@ -31,7 +31,7 @@ export default function ProductForm({
   const [formData, setFormData] = useState({
     title: initialData.title || "",
     description: initialData.description || "",
-    categoryId: initialData.categoryId || "",
+    categoryId: initialData.categoryId?._id || initialData.categoryId || "",
     price: initialData.price || "",
     discountPrice: initialData.discountPrice || "",
     stock: initialData.stock || 0,
@@ -44,30 +44,25 @@ export default function ProductForm({
 
   const MAX_IMAGES = 5;
 
-  useEffect(() => {
-    setFormData({
-      title: initialData.title || "",
-      description: initialData.description || "",
-      categoryId: initialData.categoryId || "",
-      price: initialData.price || "",
-      discountPrice: initialData.discountPrice || "",
-      stock: initialData.stock || 0,
-      attributes: {
-        color: initialData.attributes?.color || "",
-        size: initialData.attributes?.size || "",
-      },
-      isActive: initialData.isActive !== undefined ? initialData.isActive : true,
-    });
-    
-    // Load existing images for edit mode
-    if (mode === 'edit' && initialData.images) {
-      setExistingImages(initialData.images.slice(0, MAX_IMAGES)); // Limit display
-    } else {
-      setExistingImages([]);
-    }
-    setImagesToDelete([]);
-    setSelectedImages([]);
-  }, [initialData, mode]);
+useEffect(() => {
+  setFormData({
+    title: initialData.title || "",
+    description: initialData.description || "",
+    categoryId: initialData.categoryId || "",
+    price: initialData.price || "",
+    discountPrice: initialData.discountPrice || "",
+    stock: initialData.stock || 0,
+    attributes: {
+      color: initialData.attributes?.color || "",
+      size: initialData.attributes?.size || "",
+    },
+    isActive: initialData.isActive !== undefined ? initialData.isActive : true,
+  });
+
+  if (mode === 'edit' && initialData.images) {
+    setExistingImages(initialData.images.slice(0, MAX_IMAGES));
+  }
+}, []);
 
   const fetchCategories = async () => {
     try {
@@ -183,7 +178,6 @@ export default function ProductForm({
           size: formData.attributes.size || null,
         },
         isActive: formData.isActive,
-        images: [],
       };
 
       let productResponse;

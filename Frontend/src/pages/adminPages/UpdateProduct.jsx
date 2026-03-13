@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import productService from '../../services/product.service';
 import ProductForm from '../../components/admin/ProductForm';
@@ -7,12 +7,9 @@ export default function UpdateProduct() {
   const navigate = useNavigate();
   const { id } = useParams();
   
-  // Fetch product data on mount
   const [productData, setProductData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-
-  const isMobile = useMediaQuery('(max-width: 768px)'); // Add responsive hook if needed
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -21,7 +18,7 @@ export default function UpdateProduct() {
         if (result.success) {
           setProductData(result.data);
         } else {
-          setError(result.error);
+          setError(result.error || 'Failed to load product');
         }
       } catch (err) {
         setError('Failed to load product');
@@ -39,6 +36,7 @@ export default function UpdateProduct() {
   const handleCancel = () => {
     navigate('/admin/products');
   };
+
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div></div>;
   if (error || !productData) return <div className="text-red-600 text-center py-12">{error || 'Product not found'}</div>;
@@ -68,4 +66,6 @@ export default function UpdateProduct() {
       </div>
     </div>
   );
-}
+};
+
+

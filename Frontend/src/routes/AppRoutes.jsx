@@ -22,31 +22,35 @@ import AdminOrders from "../pages/adminPages/AdminOrders";
 import AdminUsers from "../pages/adminPages/AdminUsers";
 import CreateProduct from "../pages/adminPages/CreateProduct";
 import ManageProduct from "../pages/adminPages/ManageProduct";
-// import UpdateProduct from "../pages/adminPages/UpdateProduct";
-// import DeleteProduct from "../pages/adminPages/DeleteProduct";
+import UpdateProduct from "../pages/adminPages/UpdateProduct";
 
-// Reusable CSS spinner loader
+// Loader
 const PageLoader = () => (
-  <div style={{
-    position: 'fixed',
-    top: 0,
-    left: 0,
-    width: '100%',
-    height: '100%',
-    zIndex: 99999,
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    background: 'rgba(248, 248, 255, 0.95)',
-  }}>
-    <div style={{
-      width: '50px',
-      height: '50px',
-      border: '5px solid #f3f3f3',
-      borderTop: '5px solid #FFCC33',
-      borderRadius: '50%',
-      animation: 'spin 1s linear infinite'
-    }}></div>
+  <div
+    style={{
+      position: "fixed",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      zIndex: 99999,
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      background: "rgba(248, 248, 255, 0.95)",
+    }}
+  >
+    <div
+      style={{
+        width: "50px",
+        height: "50px",
+        border: "5px solid #f3f3f3",
+        borderTop: "5px solid #FFCC33",
+        borderRadius: "50%",
+        animation: "spin 1s linear infinite",
+      }}
+    ></div>
+
     <style>{`
       @keyframes spin {
         0% { transform: rotate(0deg); }
@@ -56,24 +60,20 @@ const PageLoader = () => (
   </div>
 );
 
-// Wrapper component to show loader during navigation
+// FIXED RouteLoader
 const RouteLoader = ({ children }) => {
   const location = useLocation();
   const [isNavigating, setIsNavigating] = useState(false);
-  const [displayLocation, setDisplayLocation] = useState(location);
 
   useEffect(() => {
-    if (location.pathname !== displayLocation.pathname) {
-      // Show loader during route changes - 300ms delay to make it visible
-      // This gives time for the loader to appear during page transitions
-      setIsNavigating(true);
-      const timer = setTimeout(() => {
-        setDisplayLocation(location);
-        setIsNavigating(false);
-      }, 300);
-      return () => clearTimeout(timer);
-    }
-  }, [location, displayLocation]);
+    setIsNavigating(true);
+
+    const timer = setTimeout(() => {
+      setIsNavigating(false);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   return (
     <>
@@ -105,7 +105,7 @@ const AppRoutes = createBrowserRouter([
       { path: "product/:id", element: <ProductDetails /> },
       { path: "wishlist", element: <Wishlist /> },
 
-      // ADMIN NESTED INSIDE LAYOUT
+      // ADMIN ROUTES
       {
         path: "admin",
         element: <AdminLayout />,
@@ -114,10 +114,11 @@ const AppRoutes = createBrowserRouter([
           { path: "dashboard", element: <AdminDashboard /> },
           { path: "orders", element: <AdminOrders /> },
           { path: "users", element: <AdminUsers /> },
+
+          // PRODUCT MANAGEMENT
           { path: "products", element: <ManageProduct /> },
           { path: "products/create", element: <CreateProduct /> },
-          // { path: "products/update", element: <UpdateProduct /> },
-          // { path: "products/delete", element: <DeleteProduct /> },
+          { path: "products/:id/edit", element: <UpdateProduct /> },
         ],
       },
     ],
