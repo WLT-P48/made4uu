@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import ProductCard from "../components/product/ProductCard";
 import productService from "../services/product.service";
 import categoryService from "../services/category.service";
+import { FiSearch } from "react-icons/fi";
 
 const Products = () => {
   const navigate = useNavigate();
@@ -152,37 +153,85 @@ const Products = () => {
   return (
     <div className="min-h-screen bg-gray-100 px-4 py-8 md:px-16 md:py-16 lg:px-20 lg:py-20">
 
-      {/* 🔍 SEARCH BAR */}
-      <div className="flex justify-center mb-6 md:mb-12">
-        <div className="relative w-full max-w-2xl">
+    {/* 🔍 SEARCH BAR */}
+<div className="flex justify-center mb-6 md:mb-12">
+  <div className="relative w-full max-w-2xl group">
 
-          <span className="absolute left-3 md:left-5 top-1/2 -translate-y-1/2 text-gray-400 text-lg">
-            🔍
-          </span>
+    <input
+      type="text"
+      placeholder="Search"
+      value={searchQuery}
+      onChange={(e) => {
+        setSearchQuery(e.target.value);
+        setShowDropdown(true);
+      }}
+      className="
+      w-full
+      pl-4
+      pr-12
+      py-3 md:py-4
+      rounded-full
+      bg-gray-50
+      shadow-md
+      border border-transparent
+      focus:outline-none
+      focus:ring-2 focus:ring-indigo-400
+      transition-all duration-300
+      text-sm md:text-base
 
-          <input
-            type="text"
-            placeholder="Search mugs, bottles, gifts..."
-            value={searchQuery}
-            onChange={(e) => {
-              setSearchQuery(e.target.value);
-              setShowDropdown(true);
-            }}
-            className="w-full pl-10 md:pl-14 pr-12 py-3 md:py-4 rounded-full bg-gray-50 shadow-md focus:outline-none focus:ring-2 focus:ring-indigo-400 transition text-sm md:text-base"
-          />
+      hover:shadow-xl
+      hover:border-indigo-300
+      "
+    />
 
-          {searchQuery && (
-            <button
-              onClick={() => {
-                setSearchQuery("");
-                setShowDropdown(false);
-              }}
-              className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
-            >
-              ✕
-            </button>
-          )}
+    {/* Search Icon Right Side */}
+    <span className="
+      absolute right-5 top-1/2 -translate-y-1/2
+      text-gray-500
+      pointer-events-none
+      transition-colors duration-300
+      group-hover:text-indigo-500
+    ">
+      <FiSearch size={20} />
+    </span>
 
+    {searchQuery && (
+      <button
+        onClick={() => {
+          setSearchQuery("");
+          setShowDropdown(false);
+        }}
+        className="
+        absolute right-12 top-1/2 -translate-y-1/2
+        text-gray-400
+        hover:text-red-500
+        transition duration-300
+        "
+      >
+        ✕
+      </button>
+    )}
+
+  
+
+    {/* Search Icon Right Side */}
+    <span className="absolute right-5 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none">
+      <FiSearch size={20} />
+    </span>
+
+    {searchQuery && (
+      <button
+        onClick={() => {
+          setSearchQuery("");
+          setShowDropdown(false);
+        }}
+        className="absolute right-12 top-1/2 -translate-y-1/2 text-gray-400 hover:text-black"
+      >
+        ✕
+      </button>
+    )}
+
+  
           {/* Dropdown suggestions ONLY when typing */}
           {showDropdown && searchQuery.length > 0 && (
             <div className="absolute top-full mt-3 w-full bg-white rounded-2xl shadow-xl border border-gray-100 p-3 z-50">
