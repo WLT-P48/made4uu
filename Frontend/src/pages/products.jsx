@@ -29,8 +29,14 @@ const Products = () => {
   }, []);
 
   useEffect(() => {
+    setCurrentPage(1);
+    setProducts([]);
+    setHasMore(true);
+    
     if (selectedCategory === "All") {
       fetchProducts(1);
+    } else if (selectedCategory === "hot-deals") {
+      fetchHotDeals(1);
     } else {
       fetchProductsByCategory(selectedCategory, 1);
     }
@@ -38,7 +44,7 @@ const Products = () => {
 
   // Transform backend data to match ProductCard component expectations
 const transformProduct = (product) => {
-  return {
+    return {
     id: product._id,
     name: product.title,
     img: product.images && product.images.length > 0 ? product.images[0].url : '/placeholder.jpg',
@@ -47,6 +53,9 @@ const transformProduct = (product) => {
       ? product.discountPrice
       : product.price,
     oldPrice: product.price,
+    discountPercent: product.discountPrice && product.discountPrice > 0 && product.price > 0 
+      ? Math.round(((product.price - product.discountPrice) / product.price) * 100)
+      : 0,
     rating: product.rating || 0,
     reviews: product.reviewCount || 0,
   };
@@ -120,6 +129,48 @@ const transformProduct = (product) => {
       }
     } catch (err) {
       setError("Failed to fetch products");
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const fetchHotDeals = async (page = 1) => {
+    try {
+      if (page === 1) {
+        setLoading(true);
+      } else {
+        setLoadingMore(true);
+      }
+      
+      // Fetch more products to sort for hot deals
+      const limit = ITEMS_PER_PAGE * 4; // Get more to have enough after sorting
+      const result = await productService.getAll({ page: 1, limit });
+      
+      if (result.success) {
+        let allProducts = (result.data.products || []).map(transformProduct);
+        
+        // Sort by discount desc
+        allProducts.sort((a, b) => b.discountPercent - a.discountPercent);
+        
+        // Paginate client-side
+        const start = (page - 1) * ITEMS_PER_PAGE;
+        const paginated = allProducts.slice(start, start + ITEMS_PER_PAGE);
+        
+        if (page === 1) {
+          setProducts(paginated);
+        } else {
+          setProducts(prev => [...prev, ...paginated]);
+        }
+        
+        setTotalProducts(allProducts.length);
+        setCurrentPage(page);
+        setHasMore(paginated.length === ITEMS_PER_PAGE && start + ITEMS_PER_PAGE < allProducts.length);
+      } else {
+        setError(result.error);
+      }
+    } catch (err) {
+      setError("Failed to fetch hot deals");
     } finally {
       setLoading(false);
       setLoadingMore(false);
@@ -220,17 +271,39 @@ const transformProduct = (product) => {
 
       {/* CATEGORY FILTER */}
       <div className="flex flex-wrap gap-2 md:gap-3 mb-6 md:mb-12 justify-center">
-        {["All", "Trending", "Bottles", "Mugs", "Gift Combos"].map((cat) => (
+        <button
+          key="all"
+          onClick={() => setSelectedCategory("All")}
+          className={`px-3 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition duration-300 ${
+            selectedCategory === "All"
+              ? "bg-black text-white shadow-lg"
+              : "bg-white text-gray-700 border border-gray-300 hover:bg-black hover:text-white"
+          }`}
+        >
+          All
+        </button>
+        <button
+          key="hot-deals"
+          onClick={() => setSelectedCategory("hot-deals")}
+          className={`px-3 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition duration-300 ${
+            selectedCategory === "hot-deals"
+              ? "bg-black text-white shadow-lg"
+              : "bg-white text-gray-700 border border-gray-300 hover:bg-black hover:text-white"
+          }`}
+        >
+          Hot Deals
+        </button>
+        {categories.map((cat) => (
           <button
-            key={cat}
-            onClick={() => setSelectedCategory(cat)}
+            key={cat._id}
+            onClick={() => setSelectedCategory(cat._id)}
             className={`px-3 md:px-5 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-medium transition duration-300 ${
-              selectedCategory === cat
+              selectedCategory === cat._id
                 ? "bg-black text-white shadow-lg"
                 : "bg-white text-gray-700 border border-gray-300 hover:bg-black hover:text-white"
             }`}
           >
-            {cat}
+            {cat.name || cat.slug || cat._id.slice(0, 12)}
           </button>
         ))}
       </div>

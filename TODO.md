@@ -1,9 +1,11 @@
-# Task: Replace FeaturedProducts with Today's Hot Deals (8 cards, high %off from backend)
+# Task Progress: Like Button Animation & Active State
 
-## Steps:
-- [x] 1. Create TODO.md with plan steps
-- [x] 2. Update FeaturedProducts.jsx to use HotDeals UI/logic (8 cards)
-- [x] 3. Update Home.jsx: fetch more products, sort by discount % desc, pass top 8
-- [x] 4. Test in browser (npm run dev, check home page)
-- [x] 5. Mark complete, attempt_completion
+## Plan Steps:
+- [x] 1. Create TODO.md
+- [x] 2. Add animation to ProductCard.jsx like button
+- [x] 3. Add animation to ProductDetails.jsx like button (consistency)
+- [ ] 4. Clean unused local likedProducts states in pages (products.jsx, Home.jsx etc.)
+- [ ] 5. Test: Run dev server, verify click animation + active state
+- [ ] 6. Complete task
 
+Current step: Cleaning unused local likedProducts states

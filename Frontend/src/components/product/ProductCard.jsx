@@ -11,6 +11,7 @@ const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist, wishlistLoading } = useWishlist();
   const [buttonState, setButtonState] = useState("idle"); // idle, loading, success
   const [isLiked, setIsLiked] = useState(false);
+  const [likeAnimating, setLikeAnimating] = useState(false);
 
   // ✅ Safe ID handling (fix)
   const productId = product.id || product._id;
@@ -31,8 +32,9 @@ const ProductCard = ({ product }) => {
     navigate(`/product/${productId}`);
   };
 
-  const handleLikeClick = (e) => {
+const handleLikeClick = (e) => {
     e.stopPropagation();
+    setLikeAnimating(true);
     // Use wishlist context for toggle
     toggleWishlist({
       id: productId,
@@ -41,6 +43,8 @@ const ProductCard = ({ product }) => {
       oldPrice: product.oldPrice,
       img: product.img || product.images?.[0]?.url
     });
+    // Reset animation after 500ms
+    setTimeout(() => setLikeAnimating(false), 500);
   };
 
   const handleAddToCart = async (e) => {
@@ -103,13 +107,28 @@ const ProductCard = ({ product }) => {
 
         <div
           onClick={handleLikeClick}
-          className="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-md cursor-pointer hover:scale-110 transition-transform"
+          className={`
+            absolute top-3 right-3 bg-white/95 backdrop-blur-sm p-2.5 rounded-full shadow-lg cursor-pointer 
+            transition-all duration-300 ease-out group
+            ${likeAnimating 
+              ? 'animate-ping scale-125 ring-4 ring-red-400/60 shadow-2xl bg-red-50' 
+              : 
+              isLiked 
+                ? 'scale-[1.05] ring-2 ring-red-500/40 shadow-xl hover:scale-115' 
+                : 'hover:scale-110 hover:shadow-xl hover:ring-1 hover:ring-gray-300/50'
+            }
+          `}
         >
-          {isLiked ? (
-            <SolidHeart className="h-5 w-5 text-red-500" />
-          ) : (
-            <OutlineHeart className="h-5 w-5 text-gray-600 hover:text-red-500 transition-colors" />
-          )}
+          <div className="relative">
+            {isLiked ? (
+              <SolidHeart className="h-5 w-5 text-red-500 group-hover:animate-pulse" />
+            ) : (
+              <OutlineHeart className="h-5 w-5 text-gray-600 group-hover:text-red-400 transition-colors duration-200" />
+            )}
+            {likeAnimating && (
+              <div className="absolute inset-0 bg-gradient-to-r from-red-400/20 to-pink-400/20 rounded-full animate-ping [animation-duration:400ms]" />
+            )}
+          </div>
         </div>
 
         <div className="absolute inset-0 bg-black/20 opacity-0 hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">

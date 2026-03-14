@@ -1,159 +1,194 @@
-import React from 'react';
+import React from "react";
+import { motion } from "framer-motion";
+import AnimatedBrand from "../components/common/AnimatedBrand";
 
 const aboutData = {
-  title: 'Made4UU',
-  description: 'Modern e-commerce platform for fashion, electronics & home essentials with secure checkout & fast delivery.',
-  mission: 'Our mission is to make online shopping accessible, affordable, tailored just for you because every product is made4UU.',
-  founded: '2025',
-  tagline: 'Shopping made personal, just for U.',
+  description:
+    "Modern e-commerce platform for fashion, electronics & home essentials with secure checkout & fast delivery.",
+  mission:
+    "Our mission is to make online shopping accessible, affordable, tailored just for you because every product is made4UU.",
+  founded: "2025",
+  tagline: "Shopping made personal, just for U.",
   team: [
-    { 
-      name: 'John Doe', 
-      role: 'Founder & CEO', 
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face',
-      bio: '15+ years in e-commerce innovation'
+    {
+      name: "John Doe",
+      role: "Founder & CEO",
+      image:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=face",
+      bio: "15+ years in e-commerce innovation",
     },
-    { 
-      name: 'Jane Smith', 
-      role: 'CTO & Lead Developer', 
-      image: 'https://media.istockphoto.com/id/2165425195/photo/portrait-of-a-man-in-an-office.jpg?s=1024x1024&w=is&k=20&c=tl5FUJDIyFjdvygEKHDPXKhvPq-_PSjfK35SRtdTq7I=',
-      bio: 'Full-stack expert specializing in MERN'
+    {
+      name: "Jane Smith",
+      role: "CTO & Lead Developer",
+      image:
+        "https://media.istockphoto.com/id/2165425195/photo/portrait-of-a-man-in-an-office.jpg?s=1024x1024&w=is&k=20&c=tl5FUJDIyFjdvygEKHDPXKhvPq-_PSjfK35SRtdTq7I=",
+      bio: "Full-stack expert specializing in MERN",
     },
-    { 
-      name: 'Mike Johnson', 
-      role: 'Head of Operations', 
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face',
-      bio: 'Logistics & supply chain specialist'
-    }
+    {
+      name: "Mike Johnson",
+      role: "Head of Operations",
+      image:
+        "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=face",
+      bio: "Logistics & supply chain specialist",
+    },
   ],
-  stats: [
-    { label: 'Happy Customers', value: '10K+', icon: '👥' },
-    { label: 'Products Available', value: '50K+', icon: '🛍️' },
-    { label: 'Orders Delivered', value: '100K+', icon: '🚚' },
-    { label: 'Years in Business', value: '1+', icon: '📅' }
-  ],
-  features: [
-    'Secure Payments',
-    'Fast Delivery',
-    'Easy Returns',
-    '24/7 Support'
-  ]
+};
+
+const container = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.2,
+    },
+  },
+};
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 40 },
+  show: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: "easeOut" },
+  },
 };
 
 export default function Aboutus() {
   return (
-    <div className="min-h-screen bg-linear-to-br from-gray-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
-      {/* Hero Section - Minimalist */}
-<section className="max-w-4xl mx-auto text-center mb-20 px-4">
-  <h1 className="text-5xl md:text-7xl font-black bg-linear-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-6">
-    {aboutData.title}
-  </h1>
-  <p className="text-lg md:text-xl text-gray-700 max-w-2xl mx-auto leading-relaxed mb-6 px-4">
-    {aboutData.description}
-  </p>
-  <p className="text-xl font-semibold text-blue-600 italic mb-12">
-    "{aboutData.tagline}"
-  </p>
-  <div className="w-full max-w-3xl mx-auto">
-    <img 
-      src="https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=1200&h=500&fit=crop" 
-      alt="Made4UU"
-      className="w-full rounded-2xl shadow-xl object-cover h-64 md:h-80"
-    />
-  </div>
-</section>
+    <div className="min-h-screen bg-gradient-to-br from-white via-blue-50 to-purple-50 py-16 px-4">
 
-      {/* Mission Section */}
-      <section className="max-w-4xl mx-auto text-center mb-24">
-        <h2 className="text-5xl font-bold text-gray-900 mb-8">Our Mission</h2>
-        <div className="bg-white/70 backdrop-blur-sm p-12 rounded-3xl shadow-xl">
-          <p className="text-2xl text-gray-700 leading-relaxed mb-8">
+      {/* HERO */}
+      <motion.section
+        variants={container}
+        initial="hidden"
+        animate="show"
+        className="max-w-5xl mx-auto text-center mb-24"
+      >
+        <motion.div variants={fadeUp}>
+          <AnimatedBrand />
+        </motion.div>
+
+        <motion.p
+          variants={fadeUp}
+          className="mt-6 text-lg md:text-xl text-gray-600 max-w-2xl mx-auto"
+        >
+          {aboutData.description}
+        </motion.p>
+
+        <motion.p
+          variants={fadeUp}
+          className="mt-3 text-sm text-gray-500 italic"
+        >
+          {aboutData.tagline}
+        </motion.p>
+      </motion.section>
+
+      {/* MISSION */}
+      <motion.section
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+        variants={fadeUp}
+        className="max-w-4xl mx-auto text-center mb-28"
+      >
+        <div className="bg-white/80 backdrop-blur-md p-10 md:p-14 rounded-3xl shadow-lg">
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-6">
+            Our Mission
+          </h2>
+
+          <p className="text-lg md:text-xl text-gray-700 leading-relaxed mb-6">
             {aboutData.mission}
           </p>
-          <p className="text-xl text-gray-600">
-            Founded in <span className="font-bold text-blue-600">{aboutData.founded}</span>, we deliver exceptional shopping experiences built for today's customers.
+
+          <p className="text-gray-600">
+            Founded in{" "}
+            <span className="font-bold text-blue-600">{aboutData.founded}</span>,
+            we deliver exceptional shopping experiences built for today's
+            customers.
           </p>
         </div>
-      </section>
+      </motion.section>
 
-      {/* Stats Section */}
-      <section className="max-w-6xl mx-auto mb-24">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8">
-          {aboutData.stats.map((stat, index) => (
-            <div key={index} className="group bg-white/80 backdrop-blur-sm p-8 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 hover:-translate-y-2 border border-white/50">
-              <div className="text-4xl md:text-5xl mb-4">{stat.icon}</div>
-              <h3 className="text-3xl md:text-4xl font-black text-gray-900 group-hover:text-blue-600 transition-colors mb-2">
-                {stat.value}
-              </h3>
-              <p className="text-gray-600 font-medium">{stat.label}</p>
-            </div>
-          ))}
-        </div>
-      </section>
+      {/* TEAM */}
+      <section className="max-w-6xl mx-auto mb-28">
+        <motion.h2
+          initial={{ opacity: 0, y: 40 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16"
+        >
+          Meet Our Team
+        </motion.h2>
 
-      {/* Features Section */}
-      <section className="max-w-4xl mx-auto mb-24">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 text-center mb-16">Why Choose Made4UU?</h2>
-        <div className="grid md:grid-cols-2 gap-8">
-          {aboutData.features.map((feature, index) => (
-            <div key={index} className="flex items-center space-x-6 p-8 bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all group">
-              <div className="w-16 h-16 bg-linear-to-r from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center text-2xl font-bold shadow-lg group-hover:scale-110 transition-transform">
-                {index + 1}
-              </div>
-              <span className="text-2xl font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-                {feature}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Team Section */}
-      <section className="max-w-6xl mx-auto mb-24">
-        <h2 className="text-5xl font-bold text-gray-900 text-center mb-16">Meet Our Team</h2>
-        <div className="grid md:grid-cols-3 gap-8">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          whileInView="show"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-3 gap-10"
+        >
           {aboutData.team.map((member, index) => (
-            <div key={index} className="text-center bg-white/80 backdrop-blur-sm p-10 rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 hover:-translate-y-4 group">
-              <div className="relative mb-8">
-                <img 
-                  src={member.image} 
-                  alt={member.name}
-                  className="w-32 h-32 mx-auto rounded-full object-cover shadow-2xl group-hover:scale-110 transition-transform duration-300 border-4 border-white"
-                />
-              </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-3 group-hover:text-blue-600 transition-colors">
+            <motion.div
+              key={index}
+              variants={fadeUp}
+              whileHover={{ y: -10, scale: 1.03 }}
+              className="text-center bg-white p-10 rounded-3xl shadow-md hover:shadow-xl transition-all duration-300"
+            >
+              <img
+                src={member.image}
+                alt={member.name}
+                className="w-32 h-32 mx-auto rounded-full object-cover shadow-lg mb-6 border-4 border-white"
+              />
+
+              <h3 className="text-xl font-bold text-gray-900">
                 {member.name}
               </h3>
-              <p className="text-blue-600 font-semibold text-xl mb-4">{member.role}</p>
-              <p className="text-gray-600">{member.bio}</p>
-            </div>
+
+              <p className="text-blue-600 font-semibold mb-3">
+                {member.role}
+              </p>
+
+              <p className="text-gray-600 text-sm">{member.bio}</p>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
-      {/* CTA Section */}
-      
-      <section className="max-w-4xl mx-auto text-center mb-24">
-        <div className="bg-linear-to-r from-blue-600 to-purple-700 text-white p-12 sm:p-16 rounded-3xl shadow-2xl">
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-6">Ready to experience Made4UU?</h2>
-          <p className="text-lg sm:text-xl md:text-2xl mb-8 sm:mb-12 opacity-90">Join thousands of satisfied customers today!</p>
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center max-w-xs sm:max-w-none mx-auto">
-            <a 
-              href="/products" 
-              className="block w-full sm:w-auto bg-white text-blue-600 px-6 sm:px-12 py-3 sm:py-5 text-base sm:text-xl font-bold rounded-2xl hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 text-center"
+      {/* CTA */}
+      <motion.section
+        initial={{ opacity: 0, y: 70 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.6 }}
+        className="max-w-5xl mx-auto text-center"
+      >
+        <div className="bg-white/90 backdrop-blur-lg rounded-3xl shadow-xl p-12 md:p-16 border border-gray-100">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900">
+            Ready to experience Made4UU?
+          </h2>
+
+          <p className="text-lg md:text-xl mb-10 text-gray-600">
+            Join thousands of happy customers and discover products made just
+            for you.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-5 justify-center">
+            <a
+              href="/products"
+              className="bg-blue-600 text-white px-10 py-4 font-semibold rounded-xl hover:bg-blue-700 hover:scale-105 transition-all duration-300 shadow-md"
             >
               Shop Now
             </a>
-            <a 
-              href="/contact" 
-              className="block w-full sm:w-auto border-2 border-white text-white px-6 sm:px-12 py-3 sm:py-5 text-base sm:text-xl font-bold rounded-2xl hover:bg-white hover:text-blue-600 transition-all duration-300 text-center"
+
+            <a
+              href="/contact"
+              className="border border-blue-600 text-blue-600 px-10 py-4 font-semibold rounded-xl hover:bg-blue-600 hover:text-white transition-all duration-300"
             >
               Contact Us
             </a>
           </div>
         </div>
-      </section>
-
+      </motion.section>
     </div>
   );
 }

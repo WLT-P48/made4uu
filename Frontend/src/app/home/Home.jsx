@@ -8,8 +8,8 @@ import Features from './components/Features'
 import FeaturedProducts from './components/FeaturedProducts'
 import StatsCounter from './components/StatsCounter'
 import Testimonials from './components/Testimonials'
-import NewsletterCTA from './components/NewsletterCTA'
-import WhatsAppButton from './components/WhatsAppButton'
+import AboutUs from '../../pages/Aboutus'
+
 
 // Transform backend data to match ProductCard expectations
 const transformProduct = (product) => ({
@@ -81,13 +81,9 @@ export default function Home() {
 
       {/* Testimonials Section */}
       <Testimonials />
-
-      {/* Newsletter CTA Section */}
-      <NewsletterCTA />
-
-      {/* WhatsApp Float Button */}
-      <WhatsAppButton />
+      <AboutUs />
     </div>
   )
+
 }
 
