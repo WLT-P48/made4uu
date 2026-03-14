@@ -37,18 +37,21 @@ export default function Home() {
   const [products, setProducts] = useState([])
   const [loading, setLoading] = useState(true)
 
-  // Fetch products from backend
+  // Fetch products from backend for hot deals (high %off)
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true)
-        const result = await productService.getFeatured(8)
+        // Fetch more products to sort by discount client-side
+        const result = await productService.getAll({ limit: 20, isActive: true })
         if (result.success) {
           const transformed = (result.data.products || []).map(transformProduct)
-          setProducts(transformed)
+          // Sort by discount desc, take top 8
+          const hotDeals = sortByDiscount(transformed).slice(0, 8)
+          setProducts(hotDeals)
         }
       } catch (err) {
-        console.error('Error fetching products:', err)
+        console.error('Error fetching hot deals products:', err)
       } finally {
         setLoading(false)
       }

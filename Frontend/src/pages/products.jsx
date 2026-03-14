@@ -37,20 +37,20 @@ const Products = () => {
   }, [selectedCategory]);
 
   // Transform backend data to match ProductCard component expectations
-  const transformProduct = (product) => {
-    return {
-      id: product._id,
-      name: product.title,
-      img: product.images && product.images.length > 0 ? product.images[0].url : '/placeholder.jpg',
-      // Current price = original price - discount amount
-      price: product.discountPrice && product.discountPrice > 0
-        ? product.price - product.discountPrice
-        : product.price,
-      oldPrice: product.price,
-      rating: product.rating || 0,
-      reviews: product.reviewCount || 0,
-    };
+const transformProduct = (product) => {
+  return {
+    id: product._id,
+    name: product.title,
+    img: product.images && product.images.length > 0 ? product.images[0].url : '/placeholder.jpg',
+    // Current price = discounted price if available, otherwise original price
+    price: product.discountPrice && product.discountPrice > 0
+      ? product.discountPrice
+      : product.price,
+    oldPrice: product.price,
+    rating: product.rating || 0,
+    reviews: product.reviewCount || 0,
   };
+};
 
   const fetchProducts = async (page = 1) => {
     try {

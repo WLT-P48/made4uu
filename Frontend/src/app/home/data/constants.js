@@ -8,9 +8,16 @@ export const FEATURES = [
 ]
 
 export const TESTIMONIALS = [
-  { initial: 'P', name: 'Priya S.', location: 'Pune, Maharashtra', text: '"Ordered a custom tumbler for my husband\'s birthday and he absolutely loved it! The engraving quality is top-notch and delivery was super fast."' },
-  { initial: 'R', name: 'Rahul M.', location: 'Mumbai, Maharashtra', text: '"Best gifting store in Pune! Ordered the vacuum flask set for my office team — packaging was beautiful and everyone was impressed."' },
-  { initial: 'A', name: 'Aisha K.', location: 'Nashik, Maharashtra', text: '"The Stanley tumbler is absolutely gorgeous — exactly as shown. Customer support was super responsive on WhatsApp. 10/10 recommend!"' },
+  { name: "Alice", location: "New York", initial: "A", text: "Great service, highly recommend!" },
+  { name: "Bob", location: "London", initial: "B", text: "Amazing products and fast delivery." },
+  { name: "Charlie", location: "Paris", initial: "C", text: "I love the quality and the design!" },
+  { name: "Diana", location: "Berlin", initial: "D", text: "Customer support is excellent." },
+  { name: "Eve", location: "Tokyo", initial: "E", text: "Will buy again, totally worth it!" },
+  { name: "Frank", location: "Sydney", initial: "F", text: "Very happy with my purchase." },
+  { name: "Grace", location: "Toronto", initial: "G", text: "Packaging was beautiful and safe." },
+  { name: "Hank", location: "San Francisco", initial: "H", text: "Fast shipping, product as described." },
+  { name: "Ivy", location: "Dubai", initial: "I", text: "Excellent experience shopping here!" },
+  { name: "Jack", location: "Mumbai", initial: "J", text: "High quality and affordable prices." },
 ]
 
 export const STATS = [
