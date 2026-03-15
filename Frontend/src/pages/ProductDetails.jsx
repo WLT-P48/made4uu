@@ -80,9 +80,7 @@ const fetchProduct = async () => {
         const transformedProduct = {
           id: result.data._id,
           name: result.data.title,
-          price: result.data.discountPrice && result.data.discountPrice > 0
-            ? result.data.price - result.data.discountPrice
-            : result.data.price,
+          price: result.data.discountPrice > 0 ? result.data.discountPrice : result.data.price,
           oldPrice: result.data.price,
           rating: result.data.rating || 0,
           reviews: result.data.reviewCount || 0,
@@ -126,9 +124,7 @@ const fetchProduct = async () => {
           .map((p) => ({
             id: p._id,
             name: p.title,
-            price: p.discountPrice && p.discountPrice > 0
-              ? p.price - p.discountPrice
-              : p.price,
+            price: p.discountPrice > 0 ? p.discountPrice : p.price,
             oldPrice: p.price,
             img: p.images?.length > 0
               ? p.images[0].url

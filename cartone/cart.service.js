@@ -14,7 +14,8 @@ export const getCart = async (userId) => {
 // Add or update item in cart
 export const addToCart = async (userId, productId, quantity = 1) => {
   try {
-    const response = await httpClient.post(`/cart/${userId}`, {
+    const response = await httpClient.post('/cart', {
+      userId,
       productId,
       quantity
     });
@@ -26,9 +27,9 @@ export const addToCart = async (userId, productId, quantity = 1) => {
 };
 
 // Remove item from cart (MATCHES CONTROLLER)
-export const removeFromCart = async (userId, cartItemId) => {
+export const removeFromCart = async (userId, productId) => {
   try {
-    const response = await httpClient.delete(`/cart/${userId}/${cartItemId}`);
+    const response = await httpClient.delete(`/cart/${userId}/${productId}`);
     return response.data;
   } catch (error) {
     console.error('Error removing from cart:', error);

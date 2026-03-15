@@ -154,17 +154,10 @@ const Cart = () => {
                     </div>
 
                     <div className="text-right">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-xl font-bold text-gray-900">
-                          ₹{(item.price * item.quantity).toLocaleString()}
-                        </p>
-                        {item.oldPrice > item.price && (
-                          <p className="text-gray-400 line-through text-sm">
-                            ₹{item.oldPrice.toLocaleString()}
-                          </p>
-                        )}
-                      </div>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xl font-bold text-gray-900">
+                        ₹{(item.price * item.quantity).toLocaleString()}
+                      </p>
+                      <p className="text-sm text-gray-500">
                         ₹{item.price.toLocaleString()} x {item.quantity}
                       </p>
                     </div>

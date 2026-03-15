@@ -57,7 +57,6 @@ const addOrUpdateCartItem = async (req, res) => {
     );
 
     if (existingItem) {
-      console.log(`📦 Merging: product ${productId} qty ${existingItem.quantity} + ${qty}`);
       existingItem.quantity += qty;
     } else {
       const product = await Product.findById(productId);

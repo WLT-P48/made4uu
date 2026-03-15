@@ -11,21 +11,15 @@ export const CartProvider = ({ children }) => {
   const [cartLoading, setCartLoading] = useState(false);
 
   const mapCartItems = useCallback((items = []) => {
-    return items.map((item) => {
-      const displayPrice = item.productId?.discountPrice > 0 ? item.productId.discountPrice : item.productId?.price || item.priceSnapshot;
-      return {
-        _id: item._id,
-        productId: item.productId?._id || item.productId,
-        cartItemId: item._id,
-        name: item.productId?.title || "Product",
-        price: displayPrice,
-        oldPrice: item.productId?.price || item.priceSnapshot,
-        discountPercent: item.productId?.discountPrice && item.productId?.price ? 
-          Math.round(((item.productId.price - item.productId.discountPrice) / item.productId.price) * 100) : 0,
-        quantity: item.quantity || 1,
-        img: item.productId?.images?.[0]?.url || "/placeholder.jpg",
-      };
-    });
+    return items.map((item) => ({
+      _id: item._id,           // Backend cart item ID
+      productId: item.productId?._id || item.productId,  // Product ID (for display/removal)
+      cartItemId: item._id,    // 🔧 EXPLICIT cart item ID for quantity updates
+      name: item.productId?.title || "Product",
+      price: item.priceSnapshot || 0,
+      quantity: item.quantity || 1,
+      img: item.productId?.images?.[0]?.url || "/placeholder.jpg",
+    }));
   }, []);
 
   /* =============================

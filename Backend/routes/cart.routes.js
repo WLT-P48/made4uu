@@ -17,7 +17,7 @@ const router = express.Router();
 router.get("/:userId", getCart);
 
 // Add or update item in cart
-router.post("/", addOrUpdateCartItem);
+router.post("/:userId", addOrUpdateCartItem);
 
 // Update item quantity (set absolute quantity)
 router.put("/:userId/:productId", updateCartItemQuantity);
