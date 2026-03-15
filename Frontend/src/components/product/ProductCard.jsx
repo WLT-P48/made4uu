@@ -8,7 +8,7 @@ import { HeartIcon as OutlineHeart } from "@heroicons/react/24/outline";
 const ProductCard = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { isInWishlist, toggleWishlist, wishlistLoading } = useWishlist();
+  const { isInWishlist, toggleWishlist, wishlistLoading, loading } = useWishlist();
   const [buttonState, setButtonState] = useState("idle"); // idle, loading, success
   const [isLiked, setIsLiked] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
@@ -18,8 +18,10 @@ const ProductCard = ({ product }) => {
   
   // Update isLiked when wishlist changes - fixes stale closure issue
   useEffect(() => {
-    setIsLiked(isInWishlist(productId));
-  }, [productId, isInWishlist]);
+    const liked = isInWishlist(productId);
+    setIsLiked(liked);
+    if (productId) console.log(`ProductCard ${productId}: isLiked=${liked}, loading=${loading}`);
+  }, [productId, isInWishlist, loading]);
 
   const discount =
     product.oldPrice > product.price
@@ -34,6 +36,7 @@ const ProductCard = ({ product }) => {
 
 const handleLikeClick = (e) => {
     e.stopPropagation();
+    if (wishlistLoading) return;
     setLikeAnimating(true);
     // Use wishlist context for toggle
     toggleWishlist({
@@ -43,8 +46,11 @@ const handleLikeClick = (e) => {
       oldPrice: product.oldPrice,
       img: product.img || product.images?.[0]?.url
     });
-    // Reset animation after 500ms
-    setTimeout(() => setLikeAnimating(false), 500);
+    // Reset animation and force sync
+    setTimeout(() => {
+      setLikeAnimating(false);
+      setIsLiked(isInWishlist(productId));
+    }, 500);
   };
 
   const handleAddToCart = async (e) => {
@@ -117,10 +123,13 @@ const handleLikeClick = (e) => {
                 ? 'scale-[1.05] ring-2 ring-red-500/40 shadow-xl hover:scale-115' 
                 : 'hover:scale-110 hover:shadow-xl hover:ring-1 hover:ring-gray-300/50'
             }
+            ${wishlistLoading ? 'cursor-wait opacity-75' : ''}
           `}
         >
           <div className="relative">
-            {isLiked ? (
+            {loading ? (
+              <OutlineHeart className="h-5 w-5 text-gray-400 animate-pulse" />
+            ) : isLiked ? (
               <SolidHeart className="h-5 w-5 text-red-500 group-hover:animate-pulse" />
             ) : (
               <OutlineHeart className="h-5 w-5 text-gray-600 group-hover:text-red-400 transition-colors duration-200" />

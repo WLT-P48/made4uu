@@ -11,13 +11,13 @@ const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isInWishlist, toggleWishlist, wishlistLoading, loading } = useWishlist();
 
   const [quantity, setQuantity] = useState(1);
   const [product, setProduct] = useState(null);
   const [images, setImages] = useState([]);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
-  const [loading, setLoading] = useState(true);
+  const [pageLoading, setPageLoading] = useState(true);
   const [error, setError] = useState(null);
   const [suggestedProducts, setSuggestedProducts] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
@@ -26,9 +26,11 @@ const ProductDetails = () => {
   // Update isLiked when wishlist changes - fixes stale closure issue
   useEffect(() => {
     if (product && product.id) {
-      setIsLiked(isInWishlist(product.id));
+      const liked = isInWishlist(product.id);
+      setIsLiked(liked);
+              console.log(`ProductDetails ${product.id}: isLiked=${liked}, wishlistLoading=${wishlistLoading}`);
     }
-  }, [product, isInWishlist]);
+  }, [product, isInWishlist, wishlistLoading]);
   
   // Touch/swipe support for image gallery
   const touchStartX = useRef(0);
@@ -45,7 +47,7 @@ const ProductDetails = () => {
   };
 
   const handleTouchEnd = () => {
-    const swipeThreshold = 50;
+    const swipeThreshold = 75;
     const diff = touchStartX.current - touchEndX.current;
     
     if (Math.abs(diff) > swipeThreshold) {
@@ -68,7 +70,7 @@ const ProductDetails = () => {
 
 const fetchProduct = async () => {
     try {
-      setLoading(true);
+      setPageLoading(true);
       const result = await productService.getById(id);
 
       if (result.success) {
@@ -98,7 +100,7 @@ const fetchProduct = async () => {
     } catch (err) {
       setError("Failed to fetch product details");
     } finally {
-      setLoading(false);
+      setPageLoading(false);
     }
   };
 
@@ -139,7 +141,7 @@ const fetchProduct = async () => {
     }
   };
 
-  if (loading) {
+  if (pageLoading) {
     return (
       <div className="flex justify-center items-center min-h-screen text-lg font-semibold">
         Loading...
@@ -171,7 +173,8 @@ const fetchProduct = async () => {
             {/* Main Image Container */}
             <div 
               ref={imageContainerRef}
-              className="relative overflow-hidden rounded-2xl group bg-gray-100 touch-pan-y"
+              className="relative overflow-hidden rounded-2xl group bg-gray-100" 
+              style={{ touchAction: "manipulation" }}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
@@ -191,10 +194,14 @@ const fetchProduct = async () => {
               
               {/* Like Button */}
               <div
-                onClick={() => {
+              onClick={() => {
+                  if (wishlistLoading) return;
                   setLikeAnimating(true);
                   toggleWishlist(product);
-                  setTimeout(() => setLikeAnimating(false), 500);
+                  setTimeout(() => {
+                    setLikeAnimating(false);
+                    if (product) setIsLiked(isInWishlist(product.id));
+                  }, 500);
                 }}
                 className={`
                   absolute top-3 right-3 sm:top-4 sm:right-4 bg-white/95 backdrop-blur-sm p-2 sm:p-3 rounded-full shadow-lg cursor-pointer 
@@ -206,10 +213,13 @@ const fetchProduct = async () => {
                       ? 'scale-[1.05] ring-2 ring-red-500/40 shadow-xl hover:scale-115' 
                       : 'hover:scale-110 hover:shadow-xl hover:ring-1 hover:ring-gray-300/50'
                   }
+                  ${wishlistLoading ? 'cursor-wait opacity-75' : ''}
                 `}
               >
                 <div className="relative">
-                  {isLiked ? (
+                  {loading ? (
+                    <OutlineHeart className="h-5 w-5 sm:h-6 sm:w-6 text-gray-400 animate-pulse" />
+                  ) : isLiked ? (
                     <SolidHeart className="h-5 w-5 sm:h-6 sm:w-6 text-red-500 group-hover:animate-pulse" />
                   ) : (
                     <OutlineHeart className="h-5 w-5 sm:h-6 sm:w-6 text-gray-600 group-hover:text-red-400 transition-colors duration-200" />
@@ -225,14 +235,16 @@ const fetchProduct = async () => {
                 <>
                   <button
                     onClick={handlePreviousImage}
-                    className="absolute left-2 top-1/2 -translate-y-1/2 bg-white shadow-lg p-1.5 sm:p-2 rounded-full opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all hover:bg-gray-100 z-10"
+                    className="hidden lg:absolute lg:left-2 lg:top-1/2 lg:-translate-y-1/2 bg-white shadow-lg p-3 md:p-2 rounded-full lg:opacity-0 lg:group-hover:opacity-100 transition-all hover:bg-gray-100 z-10"
+
                     aria-label="Previous image"
                   >
                     <ChevronLeftIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
                   </button>
                   <button
                     onClick={handleNextImage}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 bg-white shadow-lg p-1.5 sm:p-2 rounded-full opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-all hover:bg-gray-100 z-10"
+                    className="hidden lg:absolute lg:right-2 lg:top-1/2 lg:-translate-y-1/2 bg-white shadow-lg p-3 md:p-2 rounded-full lg:opacity-0 lg:group-hover:opacity-100 transition-all hover:bg-gray-100 z-10"
+
                     aria-label="Next image"
                   >
                     <ChevronRightIcon className="h-4 w-4 sm:h-5 sm:w-5 text-gray-700" />
@@ -247,6 +259,30 @@ const fetchProduct = async () => {
                 </div>
               )}
             </div>
+
+            {/* Mobile Thumbnail Gallery */}
+            {images.length > 1 && (
+              <div className="flex lg:hidden gap-1 overflow-x-auto pb-2 justify-center scrollbar-hide px-2">
+                {images.map((img, index) => (
+                  <button
+                    key={`thumb-${index}`}
+                    onClick={() => setSelectedImageIndex(index)}
+                    className={`relative flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                      selectedImageIndex === index
+                        ? "border-blue-600 shadow-md scale-105"
+                        : "border-gray-200 hover:border-gray-400 hover:scale-105"
+                    }`}
+                  >
+                    <img
+                      src={img}
+                      alt={`${product.name} thumb ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
+
 
             {/* Thumbnail Gallery - Visible on tablet and desktop only */}
             {images.length > 1 && (
@@ -270,6 +306,7 @@ const fetchProduct = async () => {
                 ))}
               </div>
             )}
+
           </div>
 
           {/* DETAILS */}
