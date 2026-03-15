@@ -4,6 +4,8 @@ const mongoose = require("mongoose");
 const Cart = require("../models/cart.model");
 const Product = require("../models/product.model");
 
+console.log('🛒 Cart controller loaded');
+
 /* ==============================
    GET CART
 ============================== */
@@ -135,41 +137,63 @@ const clearCart = async (req, res) => {
 };
 
 /* ==============================
-   UPDATE ITEM QUANTITY (Set absolute quantity)
+   UPDATE ITEM QUANTITY (Set absolute quantity) - WITH DEBUG LOGS
 ============================== */
 const updateCartItemQuantity = async (req, res) => {
+  console.log('🖥️ Backend: updateCartItemQuantity START');
+  console.log('👤 userId:', req.params.userId);
+  console.log('🛒 cartItemId:', req.params.productId);  // Actually cart item ID
+  console.log('🔢 quantity:', req.body.quantity);
+  
   try {
-    const { userId, productId } = req.params;
+    const { userId } = req.params;
+    const cartItemId = req.params.productId;
     const { quantity } = req.body;
 
     if (!quantity || quantity < 1) {
+      console.log('❌ Invalid quantity:', quantity);
       return res.status(400).json({ message: "Invalid quantity" });
     }
 
     const cart = await Cart.findOne({ userId });
+    console.log('📦 Cart items:', cart?.items.map(item => ({
+      productId: item.productId.toString().substring(0,24),
+      itemId: item._id.toString(),
+      qty: item.quantity
+    })) || 'NO CART');
 
     if (!cart) {
+      console.log('❌ Cart not found');
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    // Convert productId to string for comparison (handles both string and ObjectId)
+    // Find cart item by cart item _id
     const existingItemIndex = cart.items.findIndex(
-      item => item.productId.toString() === productId.toString()
+      item => item._id.toString() === cartItemId
     );
 
+    console.log('🔍 Looking for cartItemId:', cartItemId);
+    console.log('🔍 Found at index:', existingItemIndex);
+
     if (existingItemIndex === -1) {
-      return res.status(404).json({ message: "Product not found in cart" });
+      console.log('❌ Cart item not found by ID');
+      return res.status(404).json({ message: "Cart item not found" });
     }
 
-    // Set absolute quantity (replace instead of adding)
-    cart.items[existingItemIndex].quantity = quantity;
-
+    const oldQty = cart.items[existingItemIndex].quantity;
+    cart.items[existingItemIndex].quantity = Number(quantity);
+    console.log(`📊 Updated item ${cartItemId}: ${oldQty} → ${quantity}`);
+    
     await cart.save();
+    console.log('💾 Cart saved');
 
-    const updatedCart = await Cart.findOne({ userId });
-
+    // Return full populated cart
+    const updatedCart = await Cart.findOne({ userId }).populate('items.productId');
+    console.log('✅ Returning', updatedCart.items.length, 'items');
+    
     res.json(updatedCart);
   } catch (error) {
+    console.error('💥 Controller ERROR:', error.message);
     res.status(500).json({ message: error.message });
   }
 };
@@ -181,3 +205,4 @@ module.exports = {
   clearCart,
   updateCartItemQuantity,
 };
+

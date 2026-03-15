@@ -84,6 +84,11 @@ export const WishlistProvider = ({ children }) => {
       // Prevent multiple simultaneous requests
       if (wishlistLoading) return;
       
+      if (!userId) {
+        window.location.href = '/login';
+        return;
+      }
+      
       setWishlistLoading(true);
       
       // First update local state
@@ -95,22 +100,6 @@ export const WishlistProvider = ({ children }) => {
         img: product.img,
         addedAt: new Date().toISOString(),
       };
-
-      if (!userId) {
-        // For guest users, use localStorage
-        const guestWishlist = JSON.parse(localStorage.getItem("guestWishlist") || "[]");
-        const existingItemIndex = guestWishlist.findIndex(
-          (item) => String(item.productId) === String(product.id)
-        );
-
-        if (existingItemIndex === -1) {
-          guestWishlist.push(newItem);
-          localStorage.setItem("guestWishlist", JSON.stringify(guestWishlist));
-          setWishlist(guestWishlist);
-        }
-        setWishlistLoading(false);
-        return;
-      }
 
       // For logged in users - update state first, then backend
       // Check if already in wishlist to avoid duplicates (use string comparison)

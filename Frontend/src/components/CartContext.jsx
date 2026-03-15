@@ -8,8 +8,19 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [userId, setUserId] = useState(null);
   const [loading, setLoading] = useState(true);
-  // Track loading state for cart operations
   const [cartLoading, setCartLoading] = useState(false);
+
+  const mapCartItems = useCallback((items = []) => {
+    return items.map((item) => ({
+      _id: item._id,           // Backend cart item ID
+      productId: item.productId?._id || item.productId,  // Product ID (for display/removal)
+      cartItemId: item._id,    // 🔧 EXPLICIT cart item ID for quantity updates
+      name: item.productId?.title || "Product",
+      price: item.priceSnapshot || 0,
+      quantity: item.quantity || 1,
+      img: item.productId?.images?.[0]?.url || "/placeholder.jpg",
+    }));
+  }, []);
 
   /* =============================
      FETCH USER
@@ -18,94 +29,98 @@ export const CartProvider = ({ children }) => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("token");
+
         if (token) {
           const userData = await getProfile();
           setUserId(userData._id);
+        } else {
+          setUserId(null);
         }
       } catch (error) {
         console.log("User not logged in");
+        setUserId(null);
       } finally {
         setLoading(false);
       }
     };
+
     fetchUser();
+
+    window.addEventListener("storage", fetchUser);
+    return () => window.removeEventListener("storage", fetchUser);
   }, []);
 
   /* =============================
      FETCH CART
   ============================== */
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     if (!userId) return;
 
     try {
       const cartData = await cartService.getCart(userId);
       const items = cartData.items || [];
-
-      setCart(
-        items.map((item) => ({
-          _id: item._id, // Include the unique cart item ID
-          productId: item.productId?._id || item.productId,
-          name: item.productId?.title || "Product",
-          price: item.priceSnapshot,
-          quantity: item.quantity,
-          img: item.productId?.images?.[0]?.url || "/placeholder.jpg",
-        }))
-      );
+      setCart(mapCartItems(items));
     } catch (error) {
       console.error("Error fetching cart:", error);
     }
-  };
-
-  useEffect(() => {
-    if (userId) {
-      fetchCart();
-    } else {
-      const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-      setCart(guestCart);
-    }
-  }, [userId]);
+  }, [userId, mapCartItems]);
 
   /* =============================
-     ADD TO CART (Merge quantity for same product)
+     HANDLE CART SOURCE
+  ============================== */
+  useEffect(() => {
+    const syncCart = async () => {
+      if (userId) {
+        try {
+          const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
+          if (guestCart.length > 0) {
+            for (const item of guestCart) {
+              await cartService.addToCart(userId, item.productId, item.quantity);
+            }
+            localStorage.removeItem("guestCart");
+          }
+
+          await fetchCart();
+        } catch (error) {
+          console.error("Error syncing cart:", error);
+        }
+      } else {
+        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+        setCart(guestCart);
+      }
+    };
+
+    if (!loading) {
+      syncCart();
+    }
+  }, [userId, loading, fetchCart]);
+
+  /* =============================
+     ADD TO CART
   ============================== */
   const addToCart = useCallback(
     async (product, quantity = 1) => {
+      const productId = product._id || product.id;
+
+      if (!productId) {
+        console.error("Product ID is missing");
+        return;
+      }
+
       if (!userId) {
-        // For guest cart, check if product exists and merge quantity
-        const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
-        const existingItemIndex = guestCart.findIndex(
-          (item) => String(item.productId) === String(product.id)
-        );
-
-        if (existingItemIndex > -1) {
-          // Product exists - merge quantity
-          guestCart[existingItemIndex].quantity += quantity;
-        } else {
-          // New product - add as new item
-          guestCart.push({
-            productId: product.id,
-            name: product.name,
-            price: product.price,
-            quantity: quantity,
-            img: product.img,
-          });
-        }
-
-        localStorage.setItem("guestCart", JSON.stringify(guestCart));
-        setCart(guestCart);
+        window.location.href = '/login';
         return;
       }
 
       try {
-        // Pass the quantity to the backend (backend will merge if product exists)
-        await cartService.addToCart(userId, product.id, quantity);
-
+        await cartService.addToCart(userId, productId, quantity);
         await fetchCart();
       } catch (error) {
         console.error("Error adding to cart:", error);
       }
     },
-    [userId]
+    [userId, fetchCart]
   );
 
   /* =============================
@@ -130,7 +145,7 @@ export const CartProvider = ({ children }) => {
         console.error("Error removing from cart:", error);
       }
     },
-    [userId]
+    [userId, fetchCart]
   );
 
   /* =============================
@@ -138,39 +153,51 @@ export const CartProvider = ({ children }) => {
   ============================== */
   const updateQuantity = useCallback(
     async (productId, quantity) => {
-      if (quantity < 1) return;
-      
-      // Prevent multiple simultaneous requests
-      if (cartLoading) return;
-      
+      if (quantity < 1 || cartLoading) return;
+
       setCartLoading(true);
 
       if (!userId) {
         const guestCart = JSON.parse(localStorage.getItem("guestCart") || "[]");
+
         const updated = guestCart.map((item) =>
-          String(item.productId) === String(productId) ? { ...item, quantity } : item
+          String(item.productId) === String(productId)
+            ? { ...item, quantity }
+            : item
         );
+
         localStorage.setItem("guestCart", JSON.stringify(updated));
         setCart(updated);
         setCartLoading(false);
         return;
       }
 
+      const prevCart = [...cart];
+
+      const updatedCart = cart.map((item) =>
+        String(item._id) === String(productId) || String(item.cartItemId) === String(productId)
+          ? { ...item, quantity }
+          : item
+      );
+
+      setCart(updatedCart);
+
       try {
-        // Use the new updateCartQuantity to set absolute quantity (not add)
+        console.log('🔧 Using ID for update:', productId, 'type:', typeof productId);
         await cartService.updateCartQuantity(userId, productId, quantity);
         await fetchCart();
       } catch (error) {
         console.error("Error updating quantity:", error);
+        setCart(prevCart);
       } finally {
         setCartLoading(false);
       }
     },
-    [userId, cartLoading]
+    [userId, cart, cartLoading, fetchCart]
   );
 
   /* =============================
-     CLEAR
+     CLEAR CART
   ============================== */
   const clearCartItems = useCallback(async () => {
     if (!userId) {
@@ -188,6 +215,7 @@ export const CartProvider = ({ children }) => {
   }, [userId]);
 
   const cartCount = cart.reduce((total, item) => total + item.quantity, 0);
+
   const cartTotal = cart.reduce(
     (total, item) => total + item.price * item.quantity,
     0
@@ -204,6 +232,8 @@ export const CartProvider = ({ children }) => {
         cartCount,
         cartTotal,
         loading,
+        cartLoading,
+        fetchCart,
       }}
     >
       {children}

@@ -48,15 +48,17 @@ export const clearCart = async (userId) => {
   }
 };
 
-// Update cart item quantity (set absolute quantity)
-export const updateCartQuantity = async (userId, productId, quantity) => {
+// Update cart item quantity (set absolute quantity) - WITH DEBUG LOGS
+export const updateCartQuantity = async (userId, cartItemId, quantity) => {
+  console.log(`🌐 Service: PUT /cart/${userId}/${cartItemId} qty=${quantity}`);
   try {
-    const response = await httpClient.put(`/cart/${userId}/${productId}`, {
+    const response = await httpClient.put(`/cart/${userId}/${cartItemId}`, {
       quantity
     });
+    console.log(`✅ Service: Update success, ${response.data.items?.length || 0} items`);
     return response.data;
   } catch (error) {
-    console.error('Error updating cart quantity:', error);
+    console.error('❌ Service: Update failed', error.response?.status, error.response?.data?.message || error.message);
     throw error;
   }
 };
@@ -68,3 +70,4 @@ export default {
   clearCart,
   updateCartQuantity
 };
+

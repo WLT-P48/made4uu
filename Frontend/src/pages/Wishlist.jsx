@@ -1,12 +1,21 @@
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HeartIcon, TrashIcon, ShoppingCartIcon } from "@heroicons/react/24/outline";
 import { useWishlist } from "../components/WishlistContext";
 import { useCart } from "../components/CartContext";
+import { isAuthenticated } from "../services/auth.service";
 
 const Wishlist = () => {
   const navigate = useNavigate();
   const { wishlist, removeFromWishlist, clearWishlist } = useWishlist();
   const { addToCart } = useCart();
+
+  // Redirect if not logged in
+  useEffect(() => {
+    if (!isAuthenticated()) {
+      window.location.href = '/login';
+    }
+  }, []);
 
   const handleMoveToCart = (item) => {
     addToCart({
