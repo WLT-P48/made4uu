@@ -86,54 +86,58 @@ const Cart = () => {
             </button>
           </div>
         ) : (
-          <div className="grid lg:grid-cols-3 gap-8">
-            <div className="lg:col-span-2 space-y-4">
+          <div className="grid lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
+            <div className="lg:col-span-2 space-y-3 sm:space-y-4">
               {cart.map((item) => (
                 <div
                   key={item.productId}
-                  className="bg-white rounded-2xl shadow-md p-6 flex gap-4 hover:shadow-lg transition-shadow"
+                  className="bg-white rounded-xl sm:rounded-2xl shadow-sm sm:shadow-md p-3 sm:p-4 sm:p-6 flex flex-col sm:flex-row gap-3 sm:gap-4 hover:shadow-lg transition-shadow"
                 >
-                  <img
-                    src={item.img}
-                    alt={item.name}
-                    className="w-28 h-28 object-cover rounded-xl flex-shrink-0"
-                  />
+                  <div className="flex-shrink-0">
+                    <img
+                      src={item.img}
+                      alt={item.name}
+                      className="w-20 h-20 sm:w-28 sm:h-28 object-cover rounded-lg sm:rounded-xl"
+                    />
+                  </div>
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="text-lg font-semibold pr-4 line-clamp-2">
+                  <div className="flex-1 min-w-0 flex flex-col justify-between">
+                    <div className="flex justify-between items-start mb-2 sm:mb-3">
+                      <h3 className="text-sm sm:text-base md:text-lg font-semibold pr-2 line-clamp-2 flex-1">
                         {item.name}
                       </h3>
 
                       <button
                         onClick={() => handleRemove(item.cartItemId || item._id)}
-                        className="text-red-500 hover:text-red-700 font-medium text-sm p-1 -m-1 rounded transition-colors"
+                        className="text-red-500 hover:text-red-700 font-medium text-xs sm:text-sm p-1 -m-1 rounded transition-colors flex-shrink-0 ml-1"
+                        title="Remove item"
                       >
                         Remove
                       </button>
                     </div>
 
-                    <div className="flex items-center justify-between bg-gray-100 p-4 rounded-2xl mb-4">
-                      <span className="font-semibold text-gray-700 text-sm">
+                    <div className="flex items-center justify-between bg-gray-100 p-2 sm:p-3 sm:p-4 rounded-lg sm:rounded-2xl mb-2 sm:mb-3">
+                      <span className="font-semibold text-gray-700 text-xs sm:text-sm">
                         Quantity
                       </span>
 
-                      <div className="flex items-center gap-3">
+                      <div className="flex items-center gap-1 sm:gap-2 sm:gap-3">
                         <button
                           onClick={() =>
                             decreaseQuantity(item.cartItemId || item._id, item.quantity)
                           }
                           disabled={cartLoading || item.quantity <= 1}
-                          className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg active:scale-95 transition-all font-bold text-gray-800 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm hover:shadow-md active:scale-95 transition-all font-bold text-gray-800 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
+                          title="Decrease quantity"
                         >
                           {cartLoading ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-gray-900"></div>
+                            <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-gray-400 border-t-gray-900"></div>
                           ) : (
                             "−"
                           )}
                         </button>
 
-                        <span className="text-xl font-bold min-w-[2rem] text-center">
+                        <span className="text-lg sm:text-xl font-bold min-w-[2.5rem] text-center">
                           {item.quantity}
                         </span>
 
@@ -142,10 +146,11 @@ const Cart = () => {
                             increaseQuantity(item.cartItemId || item._id, item.quantity)
                           }
                           disabled={cartLoading}
-                          className="w-10 h-10 rounded-full bg-white shadow-md hover:shadow-lg active:scale-95 transition-all font-bold text-gray-800 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
+                          className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white shadow-sm hover:shadow-md active:scale-95 transition-all font-bold text-gray-800 border border-gray-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none flex items-center justify-center"
+                          title="Increase quantity"
                         >
                           {cartLoading ? (
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-gray-400 border-t-gray-900"></div>
+                            <div className="animate-spin rounded-full h-3 w-3 sm:h-4 sm:w-4 border-2 border-gray-400 border-t-gray-900"></div>
                           ) : (
                             "+"
                           )}
@@ -153,32 +158,26 @@ const Cart = () => {
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <div className="flex items-center gap-2 mb-1">
-                        <p className="text-xl font-bold text-gray-900">
-                          ₹{(item.price * item.quantity).toLocaleString()}
-                        </p>
-                        {item.oldPrice > item.price && (
-                          <p className="text-gray-400 line-through text-sm">
-                            ₹{item.oldPrice.toLocaleString()}
+                    <div className="text-right mt-auto">
+                      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between sm:gap-2 mb-1">
+                        <div className="flex items-center gap-1 sm:gap-2 mb-1 sm:mb-0">
+                          <p className="text-base sm:text-lg md:text-xl font-bold text-gray-900">
+                            ₹{(item.price * item.quantity).toLocaleString()}
                           </p>
-                        )}
+                          {item.oldPrice > item.price && (
+                            <p className="text-gray-400 line-through text-xs sm:text-sm">
+                              ₹{item.oldPrice.toLocaleString()}
+                            </p>
+                          )}
+                        </div>
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          ₹{item.price.toLocaleString()} × {item.quantity}
+                        </p>
                       </div>
-                      <p className="text-xs text-gray-500">
-                        ₹{item.price.toLocaleString()} x {item.quantity}
-                      </p>
                     </div>
                   </div>
                 </div>
               ))}
-
-              <button
-                onClick={handleClearCart}
-                disabled={isClearing}
-                className="text-red-500 hover:text-red-700 font-semibold text-sm py-2 px-4 rounded-lg border border-red-200 hover:bg-red-50 transition-all disabled:opacity-50"
-              >
-                {isClearing ? "Clearing..." : "Clear All Items"}
-              </button>
             </div>
 
             <div className="bg-white rounded-2xl shadow-lg p-8 h-fit sticky top-8">

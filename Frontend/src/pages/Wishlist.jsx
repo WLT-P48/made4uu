@@ -54,7 +54,7 @@ const Wishlist = () => {
         <div className="flex items-center justify-between mb-8">
           <div className="flex items-center gap-3">
             <HeartIcon className="h-8 w-8 text-red-500" />
-            <h1 className="text-2xl md:text-3xl font-bold">
+<h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold leading-tight">
               My Wishlist ({wishlist.length} items)
             </h1>
           </div>

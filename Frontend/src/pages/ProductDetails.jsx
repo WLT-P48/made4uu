@@ -22,6 +22,7 @@ const ProductDetails = () => {
   const [suggestedProducts, setSuggestedProducts] = useState([]);
   const [isLiked, setIsLiked] = useState(false);
   const [likeAnimating, setLikeAnimating] = useState(false);
+  const [buttonState, setButtonState] = useState("idle");
   
   // Update isLiked when wishlist changes - fixes stale closure issue
   useEffect(() => {
@@ -372,23 +373,64 @@ const fetchProduct = async () => {
             </div>
 
             {/* ADD TO BAG */}
-            <button
-              onClick={() => {
-                if (product.stock === 0) {
-                  alert("This product is out of stock");
-                  return;
-                }
-                if (quantity > product.stock) {
-                  alert(`Only ${product.stock} items available in stock`);
-                  return;
-                }
-                addToCart(product, quantity);
-              }}
-              disabled={product.stock === 0}
-              className="w-full bg-gradient-to-r from-gray-900 to-gray-700 text-white py-3 rounded-xl font-semibold hover:from-gray-800 hover:to-gray-600 transition-all duration-300 shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
-            </button>
+            <div className="relative">
+              <button
+                onClick={async (e) => {
+                  e.stopPropagation();
+                  if (product.stock === 0) {
+                    alert("This product is out of stock");
+                    return;
+                  }
+                  if (quantity > product.stock) {
+                    alert(`Only ${product.stock} items available in stock`);
+                    return;
+                  }
+                  
+                  buttonState === "loading" ? null : setButtonState("loading");
+                  
+                  try {
+                    await addToCart(product, quantity);
+                    setButtonState("success");
+                    setTimeout(() => setButtonState("idle"), 2500);
+                  } catch (error) {
+                    setButtonState("idle");
+                  }
+                }}
+                disabled={buttonState === "loading" || buttonState === "success" || product.stock === 0}
+                className={`
+                  w-full py-3 rounded-xl font-semibold flex items-center justify-center gap-2 transition-all duration-300 shadow-md
+                  ${buttonState === "success" 
+                    ? "bg-green-500 text-white hover:bg-green-600" 
+                    : "bg-gradient-to-r from-gray-900 to-gray-700 text-white hover:from-gray-800 hover:to-gray-600 hover:shadow-lg"
+                  }
+                  ${buttonState === "loading" ? "cursor-wait opacity-80" : "hover:shadow-lg"}
+                  disabled:opacity-50 disabled:cursor-not-allowed
+                `}
+              >
+                {buttonState === "idle" && (
+                  <>
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                    </svg>
+                    Add to Cart
+                  </>
+                )}
+                {buttonState === "loading" && (
+                  <svg className="animate-spin h-5 w-5" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                )}
+                {buttonState === "success" && (
+                  <>
+                    <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Added!
+                  </>
+                )}
+              </button>
+            </div>
 
             {/* Extra Info */}
             <div className="mt-8 border-t pt-6 text-sm text-gray-600 space-y-2">
