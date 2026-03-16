@@ -15,6 +15,8 @@ const cartRoutes = require("./routes/cart.routes");
 const activityLogRoutes = require("./routes/activityLog.routes");
 const adminRoutes = require("./routes/admin.routes");
 const wishlistRoutes = require("./routes/wishlist.routes");
+const contactRoutes = require("./routes/contact.routes");
+const contactInfoRoutes = require("./routes/contactInfo.routes");
 
 const app = express();
 
@@ -58,6 +60,9 @@ app.use("/api/cart", cartRoutes);
 app.use("/api/activity-logs", activityLogRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/wishlist", wishlistRoutes);
+
+app.use("/api/contacts", contactRoutes);
+app.use("/api/contact-info", contactInfoRoutes);
 
 /* ===========================
    ERROR HANDLER

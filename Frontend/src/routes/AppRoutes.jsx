@@ -23,6 +23,7 @@ import AdminUsers from "../pages/adminPages/AdminUsers";
 import CreateProduct from "../pages/adminPages/CreateProduct";
 import ManageProduct from "../pages/adminPages/ManageProduct";
 import UpdateProduct from "../pages/adminPages/UpdateProduct";
+import ManageContacts from "../pages/adminPages/ManageContacts";
 
 // Loader
 const PageLoader = () => (
@@ -119,6 +120,7 @@ const AppRoutes = createBrowserRouter([
           { path: "products", element: <ManageProduct /> },
           { path: "products/create", element: <CreateProduct /> },
           { path: "products/:id/edit", element: <UpdateProduct /> },
+          { path: "contacts", element: <ManageContacts /> },
         ],
       },
     ],
@@ -126,5 +128,6 @@ const AppRoutes = createBrowserRouter([
 
   { path: "*", element: <PageNotFound /> },
 ]);
+
 
 export default AppRoutes;

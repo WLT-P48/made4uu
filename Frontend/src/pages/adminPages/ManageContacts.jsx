@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from "react";
 import contactService from "../../services/contact.service";
-import { Trash2, Eye, Search, X, Settings, Edit3 } from "lucide-react";
+import { Trash2, Eye, Search, X, Settings, MessageCircle } from "lucide-react";
 import adminService from "../../services/admin.service";
 
 export default function ManageContacts() {
@@ -35,7 +35,6 @@ export default function ManageContacts() {
       label: 'Read'
     };
   };
-
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalContacts, setTotalContacts] = useState(0);
@@ -134,33 +133,41 @@ export default function ManageContacts() {
 
   // Load contact info
   const loadContactInfo = async () => {
+    console.log('[ManageContacts.jsx] loadContactInfo - Starting...');
     setContactInfoLoading(true);
     try {
       const result = await adminService.getContactInfo();
+      console.log('[ManageContacts.jsx] loadContactInfo result:', result);
       if (result.success) {
         setContactInfoData(result.data);
+        console.log('[ManageContacts.jsx] Contact data loaded:', result.data);
+      } else {
+        alert('[ManageContacts.jsx] Load failed: ' + result.error);
       }
     } catch (err) {
-      console.error('Load contact info error:', err);
+      console.error('[ManageContacts.jsx] loadContactInfo error:', err);
+      alert('[ManageContacts.jsx] Load error: ' + err.message);
     } finally {
       setContactInfoLoading(false);
     }
   };
 
   const saveContactInfo = async (e) => {
+    console.log('[ManageContacts.jsx] saveContactInfo - Starting, data:', contactInfoData);
     e.preventDefault();
     setContactInfoLoading(true);
     try {
       const result = await adminService.updateContactInfo(contactInfoData);
+      console.log('[ManageContacts.jsx] saveContactInfo result:', result);
       if (result.success) {
-        alert('Contact info updated successfully!');
+        alert('[ManageContacts.jsx] Success: ' + result.message);
         setContactInfoModal({ open: false });
       } else {
-        alert(result.error || 'Update failed');
+        alert('[ManageContacts.jsx] Update failed: ' + (result.error || 'Unknown error'));
       }
     } catch (err) {
-      console.error('Save contact info error:', err);
-      alert('Update failed. Check console.');
+      console.error('[ManageContacts.jsx] saveContactInfo error:', err);
+      alert('[ManageContacts.jsx] Save error: ' + err.message);
     } finally {
       setContactInfoLoading(false);
     }
@@ -189,7 +196,7 @@ export default function ManageContacts() {
 
       {/* Search Card */}
       <div className="bg-white p-4 rounded shadow">
-        <div className="flex flex-col lg:flex-row gap-3 justify-between items-center">
+<div className="flex flex-col lg:flex-row gap-3 justify-between items-center sm:flex-row flex-wrap">  
 
           {/* Contact Info Button */}
           <button
@@ -210,7 +217,7 @@ export default function ManageContacts() {
               placeholder="Search by name, email or subject..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
+className="w-full sm:min-w-[250px] border px-3 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             {searchTerm && (
@@ -260,79 +267,90 @@ export default function ManageContacts() {
                   <React.Fragment key={contact._id}>
 
                     {/* Row 1 */}
-                    <tr className={`border-t ${!contact.isRead ? 'bg-red-50 hover:bg-red-100' : ''}`}>
-                      <td className="p-4 font-medium text-gray-900">
-                        {contact.name}
-                      </td>
+    <tr className={`border-t ${!contact.isRead ? 'bg-red-50 hover:bg-red-100' : ''}`}>
+      <td className="p-4 max-w-[150px] truncate font-medium text-gray-900">
+        {contact.name}
+      </td>
 
-                      <td className="p-4 hidden lg:table-cell">
-                        <span 
-                          className={`inline-block px-2 py-1 rounded-full text-xs font-bold uppercase border ${getReadStatus(contact).className}`}
-                        >
-                          {getReadStatus(contact).label}
-                        </span>
-                      </td>
+      <td className="p-4 hidden lg:table-cell">
+        <span 
+          className={`inline-block px-2 py-1 rounded-full text-xs font-bold uppercase border ${getReadStatus(contact).className}`}
+        >
+          {getReadStatus(contact).label}
+        </span>
+      </td>
 
-                      <td className="p-4 hidden lg:table-cell">
-                        {contact.email}
-                      </td>
+      <td className="p-4 hidden lg:table-cell max-w-[200px] truncate">
+        {contact.email}
+      </td>
 
-                      <td className="p-4 hidden lg:table-cell">
-                        {contact.subject}
-                      </td>
+      <td className="p-4 hidden lg:table-cell max-w-[200px] truncate">
+        {contact.subject}
+      </td>
 
-                      <td className="p-4 hidden lg:table-cell">
-                        {new Date(contact.createdAt).toLocaleDateString()}
-                      </td>
+      <td className="p-4 hidden lg:table-cell">
+        {new Date(contact.createdAt).toLocaleDateString()}
+      </td>
 
-                      <td className="p-4 hidden lg:table-cell">
-                        <div className="flex gap-2">
-                          <button
-                            onClick={() => openViewModal(contact)}
-                            className="text-indigo-600 hover:text-indigo-800"
-                          >
-                            <Eye size={16} />
-                          </button>
+      <td className="p-4 hidden lg:table-cell">
+        <div className="flex gap-2">
+          <button
+            onClick={() => openViewModal(contact)}
+            className="text-indigo-600 hover:text-indigo-800"
+            title="View"
+          >
+            <Eye size={16} />
+          </button>
 
-                          <button
-                            onClick={() => handleDelete(contact._id)}
-                            disabled={deletingId === contact._id}
-                            className="text-red-600 hover:text-red-800"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+          <button
+            onClick={() => handleDelete(contact._id)}
+            disabled={deletingId === contact._id}
+            className="text-red-600 hover:text-red-800"
+            title="Delete"
+          >
+            <Trash2 size={16} />
+          </button>
+        </div>
+      </td>
+    </tr>
 
                     {/* Mobile Action Row */}
-                    <tr className="lg:hidden border-b">
-                      <td colSpan="5" className="px-4 pb-3">
-                        <div className="flex items-center gap-4 flex-wrap">
-                          <span 
-                            className={`px-2 py-1 rounded-full text-xs font-bold uppercase border ${getReadStatus(contact).className}`}
-                          >
-                            {getReadStatus(contact).label}
-                          </span>
-                          <button
-                            onClick={() => openViewModal(contact)}
-                            className="flex items-center gap-1 text-indigo-600"
-                          >
-                            <Eye size={16} />
-                            View
-                          </button>
-
-                          <button
-                            onClick={() => handleDelete(contact._id)}
-                            disabled={deletingId === contact._id}
-                            className="flex items-center gap-1 text-red-600"
-                          >
-                            <Trash2 size={16} />
-                            Delete
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
+    <tr className="lg:hidden border-b">
+      <td colSpan="6" className="p-4">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-lg truncate max-w-[70%]">{contact.name}</span>
+            <span 
+              className={`px-2 py-1 rounded-full text-xs font-bold uppercase border ${getReadStatus(contact).className}`}
+            >
+              {getReadStatus(contact).label}
+            </span>
+          </div>
+          <div className="text-sm text-gray-600 truncate">{contact.email}</div>
+          <div className="text-sm text-gray-600 truncate max-w-[200px]">{contact.subject}</div>
+          <div className="text-xs text-gray-500">{new Date(contact.createdAt).toLocaleDateString()}</div>
+          <div className="flex gap-3 pt-2">
+            <button
+              onClick={() => openViewModal(contact)}
+              className="flex items-center gap-1 text-indigo-600 hover:text-indigo-800 p-2 rounded"
+              title="View"
+            >
+              <Eye size={16} />
+              View
+            </button>
+            <button
+              onClick={() => handleDelete(contact._id)}
+              disabled={deletingId === contact._id}
+              className="flex items-center gap-1 text-red-600 hover:text-red-800 p-2 rounded disabled:opacity-50"
+              title="Delete"
+            >
+              <Trash2 size={16} />
+              Delete
+            </button>
+          </div>
+        </div>
+      </td>
+    </tr>
 
                   </React.Fragment>
                 ))}
@@ -452,8 +470,8 @@ export default function ManageContacts() {
 
       {/* View Modal */}
       {viewModal.open && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg max-w-xl w-full p-6">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 sm:p-6">
+          <div className="bg-white rounded-lg max-w-xl w-full max-h-[90vh] overflow-y-auto p-6">
 
             <div className="flex justify-between mb-4">
               <h2 className="text-xl font-bold">Message Details</h2>
@@ -479,7 +497,7 @@ export default function ManageContacts() {
                 {new Date(viewModal.contact?.createdAt).toLocaleString()}
               </p>
 
-              <div className="bg-gray-50 p-3 rounded">
+              <div className="bg-gray-50 p-3 rounded max-h-48 overflow-y-auto break-words prose prose-sm max-w-none">
                 {viewModal.contact?.message}
               </div>
             </div>
@@ -490,3 +508,4 @@ export default function ManageContacts() {
     </div>
   );
 }
+

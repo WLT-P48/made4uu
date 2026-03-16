@@ -114,7 +114,38 @@ const adminService = {
         error: error.response?.data?.message || 'Failed to delete user',
       };
     }
+  },
+
+  // Get site contact information
+  async getContactInfo() {
+    try {
+      const response = await httpClient.get('/contact-info');
+      console.log('[admin.service.js] GET /contact-info response:', response.data);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('[admin.service.js] GET /contact-info error:', error.response?.data || error);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Failed to fetch contact info',
+      };
+    }
+  },
+
+  // Update site contact information
+  async updateContactInfo(data) {
+    console.log('[admin.service.js] PATCH /contact-info data:', data);
+    try {
+      const response = await httpClient.patch('/contact-info', data);
+      console.log('[admin.service.js] PATCH /contact-info success:', response.data);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error('[admin.service.js] PATCH /contact-info error:', error.response?.data || error);
+      return {
+        success: false,
+        error: error.response?.data?.message || 'Failed to update contact info',
+      };
+    }
   }
-}
+};
 
 export default adminService;

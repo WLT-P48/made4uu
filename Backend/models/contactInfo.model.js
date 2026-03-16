@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
 
 const contactInfoSchema = new mongoose.Schema({
+  customId: {
+    type: String,
+    required: true,
+    unique: true
+  },
   address: {
     type: String,
     required: true,
@@ -25,7 +30,7 @@ const contactInfoSchema = new mongoose.Schema({
   timestamps: true
 });
 
-// Singleton pattern enforced in controller (no custom _id index needed)
+// Singleton pattern via customId
 const ContactInfo = mongoose.models.ContactInfo || mongoose.model('ContactInfo', contactInfoSchema);
 
 module.exports = ContactInfo;

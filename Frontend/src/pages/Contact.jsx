@@ -1,4 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import contactService from '../services/contact.service.js';
+import publicHttpClient from '../services/public.service.js';
+import adminService from '../services/admin.service.js';
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -8,6 +11,29 @@ export default function Contact() {
     message: ''
   });
   const [status, setStatus] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [contactInfo, setContactInfo] = useState(null);
+  const [contactLoading, setContactLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchContactInfo = async () => {
+      console.log('[Contact.jsx] Fetching contact info...');
+      try {
+        const response = await publicHttpClient.get('/contact-info');
+        console.log('[Contact.jsx] Fetch response:', response.data);
+        if (response.data && response.data.success) {
+          setContactInfo(response.data.data);
+        } else {
+          setContactInfo(response.data);
+        }
+      } catch (error) {
+        console.error('[Contact.jsx] Fetch error:', error.response?.data || error);
+      } finally {
+        setContactLoading(false);
+      }
+    };
+    fetchContactInfo();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -16,15 +42,27 @@ export default function Contact() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // In a real app, you would send this to your backend
-    console.log('Form submitted:', formData);
-    setStatus('success');
-    setFormData({ name: '', email: '', subject: '', message: '' });
-    
-    // Clear success message after 3 seconds
-    setTimeout(() => setStatus(''), 3000);
+    setLoading(true);
+    setStatus('');
+
+    try {
+      const result = await contactService.create(formData);
+      
+      if (result.success) {
+        setStatus('success');
+        setFormData({ name: '', email: '', subject: '', message: '' });
+        setTimeout(() => setStatus(''), 5000);
+      } else {
+        setStatus('error');
+      }
+    } catch (error) {
+      console.error('Submit error:', error);
+      setStatus('error');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -58,7 +96,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Address</h3>
-                  <p className="text-gray-600">123 E-commerce Street<br />New York, NY 10001</p>
+                  <p className="text-gray-600 whitespace-pre-line">
+                    {contactInfo?.address || 'No address data'}
+                  </p>
                 </div>
               </div>
 
@@ -70,7 +110,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Email</h3>
-                  <p className="text-gray-600">support@made4uu.com</p>
+                  <p className="text-gray-600">
+                    {contactInfo ? contactInfo.email : 'Loading...'}
+                  </p>
                 </div>
               </div>
 
@@ -82,7 +124,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Phone</h3>
-                  <p className="text-gray-600">+1 (555) 123-4567</p>
+                  <p className="text-gray-600">
+                    {contactInfo ? contactInfo.phone : 'Loading...'}
+                  </p>
                 </div>
               </div>
 
@@ -94,7 +138,9 @@ export default function Contact() {
                 </div>
                 <div>
                   <h3 className="font-semibold text-gray-900">Business Hours</h3>
-                  <p className="text-gray-600">Mon - Fri: 9:00 AM - 6:00 PM<br />Sat - Sun: 10:00 AM - 4:00 PM</p>
+                  <p className="text-gray-600 whitespace-pre-line">
+                    {contactInfo ? contactInfo.hours : 'Loading...'}
+                  </p>
                 </div>
               </div>
             </div>
@@ -118,7 +164,8 @@ export default function Contact() {
                   value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  disabled={loading}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition disabled:bg-gray-100"
                   placeholder="John Doe"
                 />
               </div>
@@ -134,7 +181,8 @@ export default function Contact() {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  disabled={loading}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition disabled:bg-gray-100"
                   placeholder="john@example.com"
                 />
               </div>
@@ -150,7 +198,8 @@ export default function Contact() {
                   value={formData.subject}
                   onChange={handleChange}
                   required
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition"
+                  disabled={loading}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition disabled:bg-gray-100"
                   placeholder="How can we help?"
                 />
               </div>
@@ -166,21 +215,29 @@ export default function Contact() {
                   onChange={handleChange}
                   required
                   rows="4"
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition resize-none"
+                  disabled={loading}
+                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition disabled:bg-gray-100 resize-none"
                   placeholder="Your message here..."
                 ></textarea>
               </div>
 
               <button
                 type="submit"
-                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold text-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-300"
+                disabled={loading}
+                className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 text-white py-3 px-6 rounded-xl font-semibold text-lg hover:shadow-lg hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100"
               >
-                Send Message
+                {loading ? 'Sending...' : 'Send Message'}
               </button>
 
               {status === 'success' && (
-                <div className="mt-4 p-4 bg-green-100 text-green-700 rounded-xl text-center">
+                <div className="mt-4 p-4 bg-green-100 border border-green-200 text-green-800 rounded-xl text-center font-medium">
                   Thank you for your message! We'll get back to you soon.
+                </div>
+              )}
+
+              {status === 'error' && (
+                <div className="mt-4 p-4 bg-red-100 border border-red-200 text-red-800 rounded-xl text-center font-medium">
+                  Failed to send message. Please try again.
                 </div>
               )}
             </form>
@@ -190,3 +247,4 @@ export default function Contact() {
     </div>
   );
 }
+

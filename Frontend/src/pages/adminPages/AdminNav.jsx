@@ -7,6 +7,7 @@ import {
   BarChart3,
   Settings,
   Plus,
+  MessageCircle,
 } from "lucide-react";
 
 export default function AdminNav() {
@@ -15,13 +16,13 @@ export default function AdminNav() {
   const buttons = [
     { label: "Dashboard", path: "/admin/dashboard", icon: <BarChart3 size={16} /> },
     { label: "Users", path: "/admin/users", icon: <Users size={16} /> },
-    { label: "Orders", path: "/admin/orders", icon: <ShoppingCart size={16} /> },
-    { label: "Settings", path: "/admin/settings", icon: <Settings size={16} /> },
-    { label: "Manage Products", path: "/admin/products", icon: <Package size={16} /> },
     { label: "Create Product", path: "/admin/products/create", icon: <Plus size={16} /> },
+    { label: "Manage Products", path: "/admin/products", icon: <Package size={16} /> },
+    { label: "Manage Contacts", path: "/admin/contacts", icon: <MessageCircle size={16} /> },
   ];
 
   const isProductsActive = location.pathname.startsWith("/admin/products");
+  const isContactsActive = location.pathname === "/admin/contacts";
 
   return (
     <div className="bg-white shadow-sm">
