@@ -94,7 +94,15 @@ const adminService = {
   async updateUserRole(id, role) {
     try {
       const response = await httpClient.put(ADMIN_ENDPOINTS.updateUserRole(id), { role });
-      return { success: true, data: response.data };
+      const data = response.data;
+      
+      // If new token provided (role change), update localStorage
+      if (data.newToken) {
+        localStorage.setItem('token', data.newToken);
+        localStorage.setItem('role', data.user.role);
+      }
+      
+      return { success: true, data };
     } catch (error) {
       return {
         success: false,

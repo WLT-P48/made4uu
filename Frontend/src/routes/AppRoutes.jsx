@@ -14,6 +14,7 @@ import Products from "../pages/products";
 import ProductDetails from "../pages/ProductDetails";
 import MyOrders from "../pages/MyOrders";
 import Wishlist from "../pages/Wishlist";
+import AdminRouteGuard from "../components/admin/AdminRouteGuard";
 
 // ADMIN
 import AdminLayout from "../pages/adminPages/AdminLayout";
@@ -109,7 +110,11 @@ const AppRoutes = createBrowserRouter([
       // ADMIN ROUTES
       {
         path: "admin",
-        element: <AdminLayout />,
+        element: (
+          <AdminRouteGuard>
+            <AdminLayout />
+          </AdminRouteGuard>
+        ),
         children: [
           { index: true, element: <Navigate to="dashboard" replace /> },
           { path: "dashboard", element: <AdminDashboard /> },

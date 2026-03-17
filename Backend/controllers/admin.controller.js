@@ -221,7 +221,15 @@ const updateUserRole = async (req, res) => {
     user.role = role;
     await user.save();
 
-    res.json({ message: "User role updated", user: { ...user._doc, password: undefined } });
+    // Generate new token with updated role
+    const jwt = require('jsonwebtoken');
+    const newToken = jwt.sign({ _id: user._id, role: user.role }, process.env.JWT_SECRET);
+
+    res.json({ 
+      message: "User role updated", 
+      user: { ...user._doc, password: undefined },
+      newToken 
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

@@ -93,11 +93,20 @@ const AdminUsers = () => {
       setUpdating(true);
       const result = await adminService.updateUserRole(userId, newRole);
       if (result.success) {
+        // Optimistic UI update
         setUsers(
           users.map((user) =>
             user._id === userId ? { ...user, role: newRole } : user
           )
         );
+        
+        // If this is current user, trigger re-fetch or reload to sync auth
+        const currentRole = localStorage.getItem('role');
+        if (currentRole !== newRole) {
+          // Reload page to sync new token/role from localStorage
+          window.location.reload();
+        }
+        
         setEditingRole(null);
         setNewRole("");
       } else {
