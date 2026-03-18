@@ -1,7 +1,7 @@
 import React from "react";
 import { RouterProvider } from "react-router-dom";
 import { GoogleOAuthProvider } from '@react-oauth/google';
-import AppRoutes from "./routes/AppRoutes"; // This is your Map
+import AppRoutes from "./routes/AppRoutes"; 
 import "./App.css";
 
 function App() {
