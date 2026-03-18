@@ -1,23 +1,28 @@
 const jwt = require('jsonwebtoken');
 
 module.exports = function (req, res, next) {
-  // 1. Get the token from the header - check both 'auth-token' and 'Authorization: Bearer'
+  // 1. Get the token from multiple possible headers
   let token = req.header('auth-token');
   
-  // Also check Authorization header with Bearer token
   const authHeader = req.header('Authorization');
   if (authHeader && authHeader.startsWith('Bearer ')) {
-    token = authHeader.substring(7);
+    token = authHeader.split(' ')[1]; // Cleaner way to get the token
   }
   
-  if (!token) return res.status(401).send('Access Denied');
+  if (!token) return res.status(401).json({ message: 'Access Denied: No token provided' });
 
   try {
-    // 2. Verify the token using your secret key
-    const verified = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = verified;
-    next(); // Let them pass
+    // 2. Verify the token 
+    // Use the secret from .env, or a fallback if .env isn't loading correctly
+    const secret = process.env.JWT_SECRET || 'my_custom_secret_key_123';
+    const verified = jwt.verify(token, secret);
+    
+    // 3. Attach the user data (id and role) to the request object
+    req.user = verified; 
+    
+    next(); 
   } catch (err) {
-    res.status(400).send('Invalid Token');
+    res.status(400).json({ message: 'Invalid or Expired Token' });
   }
+  app.use("/uploads", express.json(), express.static("uploads"));
 };
