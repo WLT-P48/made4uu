@@ -33,20 +33,62 @@ const createLog = async (req, res) => {
  */
 const getLogs = async (req, res) => {
   try {
-    const { userId, entity, action } = req.query;
+    const {
+      userId,
+      entity,
+      action,
+      from,
+      to,
+      page = 1,
+      limit = 20
+    } = req.query;
 
     const filter = {};
     if (userId) filter.userId = userId;
     if (entity) filter.entity = entity;
     if (action) filter.action = action;
+    
+    // Date filtering
+    const now = new Date();
+    if (from) {
+      filter.createdAt = { $gte: new Date(from) };
+    }
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      if (filter.createdAt) {
+        filter.createdAt.$lte = toDate;
+      } else {
+        filter.createdAt = { $lte: toDate };
+      }
+    }
 
-    const logs = await ActivityLog.find(filter).sort({ timestamp: -1 });
-    res.json(logs);
+    const skip = (parseInt(page) - 1) * parseInt(limit);
+    
+    const logs = await ActivityLog.find(filter)
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(parseInt(limit));
+
+    const total = await ActivityLog.countDocuments(filter);
+
+    res.json({
+      logs,
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / parseInt(limit)),
+        hasNext: parseInt(page) * parseInt(limit) < total
+      }
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Failed to fetch activity logs" });
   }
 };
+
 
 /**
  * Get single log by ID
@@ -82,9 +124,59 @@ const deleteLog = async (req, res) => {
   }
 };
 
+const json2csv = require('json2csv').parse;
+
+const exportLogs = async (req, res) => {
+  try {
+    const {
+      from,
+      to,
+      userId,
+      limit = 1000
+    } = req.query;
+
+    const filter = {};
+    if (userId) filter.userId = userId;
+    
+    // Date filtering
+    const now = new Date();
+    if (from) {
+      filter.createdAt = { $gte: new Date(from) };
+    }
+    if (to) {
+      const toDate = new Date(to);
+      toDate.setHours(23, 59, 59, 999);
+      if (filter.createdAt) {
+        filter.createdAt.$lte = toDate;
+      } else {
+        filter.createdAt = { $lte: toDate };
+      }
+    }
+
+    const logs = await ActivityLog.find(filter)
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 })
+      .limit(parseInt(limit));
+
+    const jsonContent = JSON.stringify(logs, null, 2);
+
+    res.set({
+      'Content-Type': 'application/json',
+      'Content-Disposition': `attachment; filename="made4uu-logs-${new Date().toISOString().split('T')[0]}.json"`,
+      'Content-Length': Buffer.byteLength(jsonContent)
+    });
+    res.send(jsonContent);
+
+  } catch (error) {
+    console.error('Export error:', error);
+    res.status(500).json({ message: "Export failed" });
+  }
+};
+
 module.exports = {
   createLog,
   getLogs,
   getLogById,
-  deleteLog
+  deleteLog,
+  exportLogs
 };

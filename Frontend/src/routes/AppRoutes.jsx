@@ -25,6 +25,8 @@ import CreateProduct from "../pages/adminPages/CreateProduct";
 import ManageProduct from "../pages/adminPages/ManageProduct";
 import UpdateProduct from "../pages/adminPages/UpdateProduct";
 import ManageContacts from "../pages/adminPages/ManageContacts";
+import AdminActivityLogs from "../pages/adminPages/AdminActivityLogs";
+import LogExport from "../pages/adminPages/LogExport";
 
 // Loader
 const PageLoader = () => (
@@ -68,6 +70,12 @@ const RouteLoader = ({ children }) => {
   const [isNavigating, setIsNavigating] = useState(false);
 
   useEffect(() => {
+    // Scroll to top on forward navigation, restore on back/forward
+    if (performance.navigation.type === 1 || performance.getEntriesByType('navigation')[0]?.type === 'navigate') {
+      window.scrollTo(0, 0);
+    }
+    // Browser handles back/forward scroll restoration automatically
+
     setIsNavigating(true);
 
     const timer = setTimeout(() => {
@@ -126,7 +134,10 @@ const AppRoutes = createBrowserRouter([
           { path: "products/create", element: <CreateProduct /> },
           { path: "products/:id/edit", element: <UpdateProduct /> },
           { path: "contacts", element: <ManageContacts /> },
+          { path: "activity-logs", element: <AdminActivityLogs /> },
+          { path: "export-logs", element: <LogExport /> },
         ],
+
       },
     ],
   },

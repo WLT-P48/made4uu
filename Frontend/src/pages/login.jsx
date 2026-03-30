@@ -49,7 +49,8 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const res = await axios.post('http://localhost:5000/api/user/login', formData);
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      const res = await axios.post(`${baseUrl}/api/user/login`, formData);
       
       localStorage.setItem('token', res.data.token);
       localStorage.setItem('role', res.data.role); 
@@ -180,7 +181,7 @@ const Login = () => {
             <span className="text-indigo-600 hover:text-indigo-500 transition-colors duration-300">UU</span>
           </motion.h1>
           <p className="text-gray-600 text-lg max-w-md leading-relaxed not-italic">
-            Welcome back. Log in to access your personalized dashboard and continue where you left off.
+            Welcome to a smarter way to shop. Register now to securely manage your orders, save your favorite items, and enjoy a streamlined checkout process.
           </p>
         </motion.div>
       </div>
@@ -278,40 +279,44 @@ const Login = () => {
                   <div className="flex-1 border-t border-gray-200"></div>
                 </motion.div>
         
-                <motion.div variants={fadeUp} className="flex justify-center w-full">
-                  <motion.div 
-                    whileHover={{ scale: 1.04, y: -3 }}
-                    whileTap={{ scale: 0.97 }}
-                    animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-                    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-                    className="w-full max-w-[320px] rounded-full p-[2px] bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 bg-[length:200%_200%] shadow-[0_5px_15px_rgba(99,102,241,0.2)] hover:shadow-[0_10px_30px_rgba(99,102,241,0.4)]"
-                  >
-                    <div className="bg-white w-full rounded-full flex items-center justify-center overflow-hidden">
-                      <GoogleLogin
-                        onSuccess={async (credentialResponse) => {
-                            try {
-                              const res = await axios.post('http://localhost:5000/api/user/google-login', { token: credentialResponse.credential });
-                              localStorage.setItem('token', res.data.token);
-                              localStorage.setItem('role', res.data.role); 
-                              if (res.data.user) {
-                                  localStorage.setItem('user', JSON.stringify(res.data.user));
-                              }
-                              setSuccess("Authentication successful.");
-                              setTimeout(() => navigate("/"), 1000); 
-                            } catch (err) {
-                              setError("Google authentication failed.");
-                            }
-                        }}
-                        onError={() => setError('Google Login Failed')}
-                        theme="outline"
-                        shape="pill"
-                        text="continue_with"
-                        size="large"
-                        width="316"
-                      />
-                    </div>
-                  </motion.div>
-                </motion.div>
+<motion.div variants={fadeUp} className="flex justify-center w-full px-4">
+  <motion.div 
+    whileHover={{ scale: 1.04, y: -3 }}
+    whileTap={{ scale: 0.97 }}
+    animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+    /* REMOVED: w-full and max-w-320 (this was causing the squeeze) */
+    className="rounded-full p-[2px] bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 bg-[length:200%_200%] shadow-[0_5px_15px_rgba(99,102,241,0.2)]"
+  >
+    {/* FIXED: Removed the white background div that was clipping the button */}
+    <div className="rounded-full overflow-hidden flex items-center justify-center bg-white">
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+            try {
+              const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+              const res = await axios.post(`${baseUrl}/api/user/google-login`, { token: credentialResponse.credential });
+              localStorage.setItem('token', res.data.token);
+              localStorage.setItem('role', res.data.role); 
+              if (res.data.user) {
+                  localStorage.setItem('user', JSON.stringify(res.data.user));
+              }
+              setSuccess("Authentication successful.");
+              setTimeout(() => navigate("/"), 1000); 
+            } catch (err) {
+              setError("Google authentication failed.");
+            }
+        }}
+        onError={() => setError('Google Login Failed')}
+        theme="outline"
+        shape="pill"
+        text="continue_with"
+        size="large"
+        /* FIXED: Use 312 instead of 316 so it fits INSIDE the 2px gradient border perfectly */
+        width="312" 
+      />
+    </div>
+  </motion.div>
+</motion.div>
 
                 <motion.div variants={fadeUp} className="mt-12 text-center text-sm text-gray-500 font-medium">
                   Don't have an account?{' '}
@@ -326,9 +331,6 @@ const Login = () => {
 
             ) : (
 
-              /* ------------------------------------- */
-              /* FORGOT PASSWORD FORM */
-              /* ------------------------------------- */
               <motion.div key="forgot-password-form" variants={staggerContainer} initial="hidden" animate="visible" exit="exit">
                 <motion.div variants={fadeUp} className="mb-10">
                   <h2 className="text-3xl font-bold text-gray-900 mb-2">Reset Password</h2>

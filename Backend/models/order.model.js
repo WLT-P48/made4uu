@@ -48,6 +48,29 @@ const orderSchema = new mongoose.Schema({
     enum: ["PLACED", "SHIPPED", "DELIVERED", "CANCELLED"],
     default: "PLACED"
   },
+  // Real-time Shiprocket tracking fields (webhook updates)
+  current_status: {
+    type: String,
+    default: "Order Placed"
+  },
+  shipment_status: {
+    type: String
+  },
+  shipment_status_id: {
+    type: Number
+  },
+  current_timestamp: {
+    type: Date,
+    default: Date.now
+  },
+  etd: {
+    type: Date
+  },
+  scans: [{
+    date: { type: String },
+    activity: { type: String },
+    location: { type: String }
+  }],
 
   shippingAddressId: {
     type: mongoose.Schema.Types.ObjectId,
@@ -58,16 +81,56 @@ const orderSchema = new mongoose.Schema({
   payment: {
     provider: {
       type: String,
-      enum: ["razorpay", "cash_on_delivery"] // extendable for other providers
+      enum: ["razorpay", "cash_on_delivery"]
     },
+    razorpayOrderId: { type: String },
+    razorpayPaymentId: { type: String },
     transactionId: { type: String },
-    status: { type: String }
+    status: { 
+      type: String,
+      enum: ['PENDING', 'PAID', 'FAILED', 'REFUNDED']
+    }
   },
 
   paymentStatus: {
     type: String,
     enum: ["PAID", "UNPAID", "CASH_ON_DELIVERY"],
     default: "UNPAID"
+  },
+
+  deliveryProvider: {
+    type: String
+  },
+  trackingId: {
+    type: String
+  },
+  shipmentId: {
+    type: String
+  },
+  awbCode: {
+    type: String
+  },
+  courierName: {
+    type: String
+  },
+  pickupBooked: {
+    type: Boolean,
+    default: false
+  },
+  labelPdf: {
+    type: String
+  },
+  invoicePdf: {
+    type: String
+  },
+  manifestPdf: {
+    type: String
+  },
+  packageDimensions: {
+    length: { type: Number, default: 10 },
+    breadth: { type: Number, default: 10 },
+    height: { type: Number, default: 10 },
+    weight: { type: Number, default: 0.5 }
   },
 
   createdAt: {

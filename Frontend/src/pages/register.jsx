@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from "react-router-dom";
+import { GoogleLogin } from '@react-oauth/google';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -32,7 +33,9 @@ const Register = () => {
 
     setLoading(true);
     try {
-      await axios.post('http://localhost:5000/api/user/send-otp', { email: formData.email });
+      const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+      await axios.post(`${baseUrl}/api/user/send-otp`, { email: formData.email });
+      
       setSuccess(`Verification code sent to ${formData.email}`);
       setStep(2); // Move to OTP input
     } catch (err) {
@@ -65,7 +68,6 @@ const Register = () => {
   const fadeUp = { hidden: { opacity: 0, y: 15 }, visible: { opacity: 1, y: 0, transition: { duration: 0.6 } } };
   const primaryButtonHover = { scale: 1.02, transition: { type: "spring", stiffness: 400, damping: 10 } };
   const buttonTap = { scale: 0.98 };
-  // ADDED: The missing brandHover definition
   const brandHover = { scale: 1.02, transition: { type: "spring", stiffness: 400, damping: 10 } }; 
 
   return (
@@ -82,7 +84,7 @@ const Register = () => {
                   <span className="text-indigo-600 hover:text-indigo-500 transition-colors duration-300">UU</span>
                 </motion.h1>
                 <p className="text-gray-600 text-lg max-w-md leading-relaxed not-italic">
-                  Welcome back. Log in to access your personalized dashboard and continue where you left off.
+                  Welcome to a smarter way to shop. Register now to securely manage your orders, save your favorite items, and enjoy a streamlined checkout process.
                 </p>
               </motion.div>
             </div>
@@ -91,9 +93,7 @@ const Register = () => {
       <div className="w-full md:w-1/2 flex items-center justify-center p-8 sm:p-12 lg:p-24 relative z-10">
         <div className="w-full max-w-md">
           
-          {/* Mobile Header */}
           <div className="mb-10 md:hidden text-left">
-            {/* UPDATED: Mobile Title Hover Effect */}
             <h1 className="text-4xl font-black text-black tracking-tight mb-2 cursor-default flex items-center">
               <motion.span 
                 whileHover={{ scale: 1.05 }} 
@@ -149,12 +149,12 @@ const Register = () => {
                       id="reg-name" 
                       type="text" 
                       name="name" 
-                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-black font-medium focus:border-black focus:outline-none transition-colors placeholder-transparent" 
+                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-gray-900 font-medium focus:border-indigo-600 focus:outline-none transition-colors placeholder-transparent" 
                       onChange={handleChange} 
                       value={formData.name} 
                       placeholder="Name" 
                     />
-                    <label htmlFor="reg-name" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-black pointer-events-none cursor-text">
+                    <label htmlFor="reg-name" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-indigo-600 pointer-events-none ">
                       Full Name
                     </label>
                   </div>
@@ -165,12 +165,12 @@ const Register = () => {
                       id="reg-email" 
                       type="email" 
                       name="email" 
-                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-black font-medium focus:border-black focus:outline-none transition-colors placeholder-transparent" 
+                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-gray-900 font-medium focus:border-indigo-600 focus:outline-none transition-colors placeholder-transparent" 
                       onChange={handleChange} 
                       value={formData.email} 
                       placeholder="Email" 
                     />
-                    <label htmlFor="reg-email" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-black pointer-events-none cursor-text">
+                    <label htmlFor="reg-email" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-indigo-600 pointer-events-none">
                       Email Address
                     </label>
                   </div>
@@ -181,35 +181,34 @@ const Register = () => {
                       id="reg-password" 
                       type="password" 
                       name="password" 
-                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-black font-medium focus:border-black focus:outline-none transition-colors placeholder-transparent" 
+                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-gray-900 font-medium focus:border-indigo-600 focus:outline-none transition-colors placeholder-transparent" 
                       onChange={handleChange} 
                       value={formData.password} 
                       placeholder="Password" 
                     />
-                    <label htmlFor="reg-password" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-black pointer-events-none cursor-text">
+                    <label htmlFor="reg-password" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-indigo-600 pointer-events-none">
                       Password
                     </label>
                   </div>
                 </motion.div>
               ) : (
                 <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-8 flex flex-col items-center justify-center h-full w-full">
-                  {/* OTP Input */}
                   <div className="relative w-full">
                     <input 
                       id="reg-otp" 
                       type="text" 
                       name="otp" 
                       maxLength="6" 
-                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-black focus:border-black focus:outline-none transition-colors placeholder-transparent font-black tracking-widest text-center text-xl" 
+                      className="peer w-full border-b-2 border-gray-300 bg-transparent py-2 text-gray-900 focus:border-indigo-600 focus:outline-none transition-colors placeholder-transparent font-black tracking-widest text-center text-xl" 
                       onChange={handleChange} 
                       value={formData.otp} 
                       placeholder="000000" 
                     />
-                    <label htmlFor="reg-otp" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-black pointer-events-none cursor-text text-center w-full">
+                    <label htmlFor="reg-otp" className="absolute left-0 -top-3.5 text-gray-500 font-medium text-sm transition-all peer-placeholder-shown:text-base peer-placeholder-shown:text-gray-400 peer-placeholder-shown:top-2 peer-focus:-top-3.5 peer-focus:text-sm peer-focus:text-indigo-600 pointer-events-none text-center w-full">
                       6-Digit OTP
                     </label>
                   </div>
-                  <button type="button" onClick={() => setStep(1)} className="text-sm text-gray-600 font-bold hover:text-black transition-colors">
+                  <button type="button" onClick={() => setStep(1)} className="text-sm text-indigo-600 font-bold hover:text-black transition-colors">
                     Wrong email? Go back
                   </button>
                 </motion.div>
@@ -229,8 +228,47 @@ const Register = () => {
             </motion.div>
           </form>
 
-          {/* THE LINK BACK TO LOGIN */}
-          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="mt-12 text-center text-sm text-gray-500 font-medium">
+          <motion.div variants={fadeUp} className="my-8 flex items-center">
+            <div className="flex-1 border-t border-slate-200"></div>
+            <span className="px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Or continue with</span>
+            <div className="flex-1 border-t border-slate-200"></div>
+          </motion.div>
+  
+<motion.div variants={fadeUp} className="flex justify-center w-full mb-8">
+  <motion.div 
+    whileHover={{ scale: 1.02, y: -2 }}
+    whileTap={{ scale: 0.98 }}
+    animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+    className="w-full max-w-[310px] rounded-full p-[1.5px] bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 bg-[length:200%_200%] shadow-lg overflow-hidden"
+  >
+    <div className="bg-white w-full rounded-full flex items-center justify-center overflow-hidden">
+      <GoogleLogin
+        onSuccess={async (credentialResponse) => {
+            try {
+              const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+              const res = await axios.post(`${baseUrl}/api/user/google-login`, { token: credentialResponse.credential });
+              localStorage.setItem('token', res.data.token);
+              localStorage.setItem('role', res.data.role); 
+              setSuccess("Authentication successful.");
+              setTimeout(() => navigate("/"), 1000);
+            } catch (err) {
+              setError("Google authentication failed.");
+            }
+        }}
+        onError={() => setError('Google Login Failed')}
+        theme="outline"
+        shape="pill"
+        text="continue_with"
+        size="large"
+        /* CHANGED: 300px ensures it fits INSIDE the container without smashing the left wall */
+        width="300" 
+      />
+    </div>
+  </motion.div>
+</motion.div>
+
+          <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center text-sm text-slate-500 font-medium">
             Already have an account?{' '}
              <button onClick={() => navigate('/login')} className="text-indigo-600 font-semibold hover:text-indigo-800 transition-colors relative after:absolute after:bottom-0 after:left-0 after:h-[2px] after:w-full after:origin-bottom-right after:scale-x-0 after:bg-indigo-600 after:transition-transform after:duration-300 hover:after:origin-bottom-left hover:after:scale-x-100">
               Sign in here
