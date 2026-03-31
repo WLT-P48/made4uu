@@ -1,13 +1,13 @@
 import React from "react";
 import { motion } from "framer-motion";
 
-const AnimatedBrand = () => {
+const AnimatedBrand = ({ className = "" }) => {
   return (
     <div className="relative inline-flex items-center justify-center select-none cursor-pointer">
       
       {/* Brand Text */}
       <motion.h1
-        className="relative flex items-center text-2xl lg:text-3xl font-extrabold tracking-tight"
+        className={`relative flex items-center font-extrabold tracking-tight ${className}`}
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -34,9 +34,7 @@ const AnimatedBrand = () => {
         </motion.span>
 
         {/* Thick RGB Underline */}
-        <div className="absolute left-0 -bottom-2 w-full h-[5px] overflow-hidden rounded-full">
-          
-          {/* RGB Flow */}
+        <div className="absolute left-0 -bottom-2 w-full h-[6px] overflow-hidden rounded-full">
           <motion.div
             className="h-full w-full"
             animate={{
@@ -53,7 +51,6 @@ const AnimatedBrand = () => {
               backgroundSize: "200% 100%",
             }}
           />
-
         </div>
       </motion.h1>
     </div>

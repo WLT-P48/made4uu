@@ -3,6 +3,7 @@ import axios from 'axios';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from "react-router-dom";
 import { GoogleLogin } from '@react-oauth/google';
+import AnimatedBrand from '../components/common/AnimatedBrand';
 
 const Register = () => {
   const navigate = useNavigate();
@@ -76,15 +77,11 @@ const Register = () => {
       {/* Left Side Branding */}
             <div className="hidden md:flex md:w-1/2 flex-col justify-center items-start p-16 lg:p-24 relative z-10">
               <motion.div initial={{ opacity: 0, x: -30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.8 }}>
-                <motion.h1 
-                  className="text-5xl lg:text-7xl font-black text-gray-900 tracking-tight mb-6 cursor-default"
-                  whileHover={brandHover}
-                >
-                  <span className="hover:text-indigo-700 transition-colors duration-300">Made4</span>
-                  <span className="text-indigo-600 hover:text-indigo-500 transition-colors duration-300">UU</span>
-                </motion.h1>
-                <p className="text-gray-600 text-lg max-w-md leading-relaxed not-italic">
-                  Welcome to a smarter way to shop. Register now to securely manage your orders, save your favorite items, and enjoy a streamlined checkout process.
+                       <AnimatedBrand className="text-5xl md:text-5xl lg:text-6xl xl:text-7xl" />
+                
+                <p className="mt-4 text-gray-600 text-base md:text-lg lg:text-xl max-w-lg leading-relaxed">
+                  Welcome to a smarter way to shop. Sign in now to securely manage your orders, 
+                  save your favorite items, and enjoy a streamlined checkout process.
                 </p>
               </motion.div>
             </div>
@@ -228,45 +225,52 @@ const Register = () => {
             </motion.div>
           </form>
 
-          <motion.div variants={fadeUp} className="my-8 flex items-center">
+<motion.div variants={fadeUp} className="my-6 sm:my-8 flex items-center">
             <div className="flex-1 border-t border-slate-200"></div>
-            <span className="px-4 text-xs font-medium text-slate-400 uppercase tracking-wider">Or continue with</span>
+            <span className="px-3 sm:px-4 text-xs sm:text-sm font-medium text-slate-400 uppercase tracking-wider">Or continue with</span>
             <div className="flex-1 border-t border-slate-200"></div>
           </motion.div>
-  
-<motion.div variants={fadeUp} className="flex justify-center w-full mb-8">
-  <motion.div 
-    whileHover={{ scale: 1.02, y: -2 }}
-    whileTap={{ scale: 0.98 }}
-    animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
-    transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-    className="w-full max-w-[310px] rounded-full p-[1.5px] bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-500 bg-[length:200%_200%] shadow-lg overflow-hidden"
-  >
-    <div className="bg-white w-full rounded-full flex items-center justify-center overflow-hidden">
-      <GoogleLogin
-        onSuccess={async (credentialResponse) => {
-            try {
-              const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
-              const res = await axios.post(`${baseUrl}/api/user/google-login`, { token: credentialResponse.credential });
-              localStorage.setItem('token', res.data.token);
-              localStorage.setItem('role', res.data.role); 
-              setSuccess("Authentication successful.");
-              setTimeout(() => navigate("/"), 1000);
-            } catch (err) {
-              setError("Google authentication failed.");
-            }
-        }}
-        onError={() => setError('Google Login Failed')}
-        theme="outline"
-        shape="pill"
-        text="continue_with"
-        size="large"
-        /* CHANGED: 300px ensures it fits INSIDE the container without smashing the left wall */
-        width="300" 
-      />
-    </div>
-  </motion.div>
-</motion.div>
+
+          <motion.div 
+            variants={fadeUp} 
+            className="flex justify-center w-full mb-6 sm:mb-8"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <motion.div 
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              animate={{ backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"] }}
+              transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+              className="w-full max-w-[260px] xs:max-w-[280px] sm:max-w-[300px] md:max-w-[320px] rounded-full p-1 xs:p-1.5 sm:p-2 bg-gradient-to-r from-teal-400 via-indigo-500 to-purple-600 bg-[length:200%_200%] shadow-lg sm:shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden"
+              style={{ minHeight: '52px' }}
+            >
+              <div className="bg-white/95 backdrop-blur-sm w-full h-full rounded-full flex items-center justify-center overflow-hidden shadow-sm border border-white/50">
+                <GoogleLogin
+                  onSuccess={async (credentialResponse) => {
+                      try {
+                        const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+                        const res = await axios.post(`${baseUrl}/api/user/google-login`, { token: credentialResponse.credential });
+                        localStorage.setItem('token', res.data.token);
+                        localStorage.setItem('role', res.data.role); 
+                        setSuccess("Authentication successful! Redirecting...");
+                        setTimeout(() => navigate("/"), 1500);
+                      } catch (err) {
+                        setError("Google authentication failed. Please try again.");
+                      }
+                  }}
+                  onError={() => setError('Google Login Failed')}
+                  theme="outline"
+                  shape="pill"
+                  text="continue_with"
+                  size="large"
+                  width="260"
+                  logo_alignment="center"
+                />
+              </div>
+            </motion.div>
+          </motion.div>
 
           <motion.div variants={fadeUp} initial="hidden" animate="visible" className="text-center text-sm text-slate-500 font-medium">
             Already have an account?{' '}
